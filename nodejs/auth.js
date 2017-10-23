@@ -32,8 +32,7 @@ db.defaults({ clientcredential: [],tokens:[] })
         'Accept': 'application/json',
          'Accept-Encoding': 'gzip',
          'Content-Type':"applicaiton/x-www-form-urlencoded",
-      //  "Authorization": "Basic RHk2TDhTcDlRU2hXT1RxalNVOkhKR2NxT3c3b29TWnRmWU9XdkhkR1dpRk1WTGhyUVlwZzhQa3BJMlRpUWZh"
-        "Authorization": "Basic " + new Buffer( username + ":" + password ).toString('base64')
+        "Authorization": "Basic " + new Buffer( process.env.username + ":" + process.env.password ).toString('base64')
     }
     // Configure the request
     var options = {
@@ -71,7 +70,7 @@ exports.getAccessToken = function (bbmid, callback) {
        var params = { grant_type:'client_credentials', scope:'bot'  }
        var url = "https://auth-beta.bbm.blackberry.com:8443/oauth/token";
        // Start the request
-       request(getReqOptions(url,params,"Dy6L8Sp9QShWOTqjSU" ,"HJGcqOw7ooSZtfYOWvHdGWiFMVLhrQYpg8PkpI2TiQfa" ), function (error, response, body) {
+       request(getReqOptions(url,params,process.env.username ,process.env.password ), function (error, response, body) {
            if (!error && response.statusCode == 200) {
              console.log ( "200");
              body = JSON.parse (body);
