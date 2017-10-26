@@ -5,6 +5,8 @@
 * internal utility to get Request options for accessing Token Server
 */
  exports.getReqOptionsForTokenService = function(url,body,username,password) {
+
+   console.log ('options for token service: ' + url + ":" + username + ":" + password);
     var fs = require('fs')
         , path = require('path')
         , certFile = path.resolve(__dirname, 'ssl/bbmmobilenews.com_thawte.crt')
