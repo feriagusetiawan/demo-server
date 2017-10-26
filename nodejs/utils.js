@@ -1,7 +1,7 @@
 
 //some utilities function
   exports.getHelloCodeByChat = function (chatId) {
-      var session = db.get('sessions[0]').find('chatId':chatId).value;
+      var session = db.get('sessions[0]').find({'chatId':chatId}).value();
       return session.helloCode;
 
    }
@@ -9,14 +9,14 @@
 
   exports.applyEnvelope = function (chId,chatId,from,to,botInfo, messages) {
     var msg = {
-      "mType": "bot",
-      "chId": chId,
-      "chatId": chatId,
-      "from": from,
-      "to": to,
-       "messages": messages,
-       "userInfos": botInfo
-     };
+          "mType": "bot",
+          "chId": chId,
+          "chatId": chatId,
+          "from": from,
+          "to": to,
+           "messages": messages,
+           "userInfos": botInfo
+         };
 
      return msg;
 
@@ -58,8 +58,9 @@ exports.createButtonsMessage = function (chId,chatId,from,to,botInfo) {
                   "actions": [ { "type": "text", "text": { "label": "Discover latest offers", "text": "Discover latest offers" } },
                                { "type": "postback", "postback": { "label": "Book this offer", "data": "action=book&location=rome&offer=123" } },
                                { "type": "postback", "postback": { "label": "Summer        catalogue", "data": "season=summer&location=rome" } },
-                               { "type": "link", "link": { "label": "Go to our website", "url": "http://example.com/page/123", "text": "Go to our website" } } ] } };
-                        ];
+                               { "type": "link", "link": { "label": "Go to our website", "url": "http://example.com/page/123", "text": "Go to our website" } }
+                        ]}
+                      }];
 
   return this.applyEnvelop (chId,chatId,from,to,botInfo,messages);
 }
@@ -93,8 +94,8 @@ exports.createMenuMessage = function (chId,chatId,from,to,botInfo) {
 * 2. remove existing records for the helloCode
 * 3. add new payload to table
 */
-exports.dumpPayload (table,chatId,payload) {
-  var session = db.get('sessions[0]').find({chatId:chatId}).value;
+exports.dumpPayload = function (table,chatId,payload) {
+  var session = db.get('sessions[0]').find({chatId:chatId}).value();
   db.get(table).remove({helloCode:session.helloCode});
   db.get(table).push({helloCode:session.helloCode,payload:payload}).write();
 }
