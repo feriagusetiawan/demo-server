@@ -4,7 +4,8 @@ var express = require("express");
 var bodyParser = require('body-parser');
 var request = require('request');
 var auth = require('./auth');
-var auth = require('./utils');
+var chat = require('./chat');
+var utils = require('./utils');
 
 var app = express();
 app.use(bodyParser.json({ type: 'application/json' }));
@@ -196,9 +197,9 @@ router.get('/chat/hello', function(req, res) {
 
       //get credential, then send message
       auth.getClientCredential (function (cred){
-           utils.sendMessage (cred.accessToken,req.body.mTok,req.body.chatId,outMsg);
+           chat.sendMessage (cred.accessToken,req.body.mTok,req.body.chatId,outMsg);
            //dump the payload
-            utils.dumpPayload ("outgoings",req.body.chatId, outMsg) ;
+            chat.dumpPayload ("outgoings",req.body.chatId, outMsg) ;
 
       });
 
@@ -211,7 +212,7 @@ router.get('/chat/hello', function(req, res) {
      * ======================================================
      */
      router.post('/chat/postback', function(req, res) {
-       utils.dumpPayload ("incomings",req.body.chatId,req.body) ;
+       chat.dumpPayload ("incomings",req.body.chatId,req.body) ;
       });
 
 

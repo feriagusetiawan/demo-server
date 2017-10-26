@@ -1,118 +1,60 @@
 
-//some utilities function
-  exports.getHelloCodeByChat = function (chatId) {
-      var session = db.get('sessions[0]').find({'chatId':chatId}).value();
-      return session.helloCode;
 
-   }
+//
+/**
+* internal utility to get Request options for accessing Token Server
+*/
+ exports.getReqOptionsForTokenService = function(url,body,username,password) {
+    var fs = require('fs')
+        , path = require('path')
+        , certFile = path.resolve(__dirname, 'ssl/bbmmobilenews.com_thawte.crt')
+        , keyFile = path.resolve(__dirname, 'ssl/bbmmobilenews.com_thawte.key')  ;
+    //    , caFile = path.resolve(__dirname, 'ssl/ca.cert.pem');
 
-
-  exports.applyEnvelope = function (chId,chatId,from,to,botInfo, messages) {
-    var msg = {
-          "mType": "bot",
-          "chId": chId,
-          "chatId": chatId,
-          "from": from,
-          "to": to,
-           "messages": messages,
-           "userInfos": botInfo
-         };
-
-     return msg;
-
+    // Set the headers
+    var headers = {
+        'Accept': 'application/json',
+         'Accept-Encoding': 'gzip',
+         'Content-Type':"applicaiton/x-www-form-urlencoded",
+         "Authorization": "Basic " + new Buffer( username + ":" + password ).toString('base64')
+    }
+    // Configure the request
+    var options = {
+        url: url,
+        method: 'POST',
+        headers: headers,
+        form: body,
+        cert: fs.readFileSync(certFile),
+        key: fs.readFileSync(keyFile),
+    }
+    return options;
   }
 
+  //
+  /**
+  * internal utility to get Request options for accessing Partner API
+  */
+  exports.getReqOptionsForApiService = function(url,body,token) {
+      /* var fs = require('fs')
+          , path = require('path')
+           , certFile = path.resolve(__dirname, 'ssl/bbmmobilenews.com_thawte.crt')
+           , keyFile = path.resolve(__dirname, 'ssl/bbmmobilenews.com_thawte.key')  ;
+           , caFile = path.resolve(__dirname, 'ssl/ca.cert.pem');
+        */
 
-
-exports.createTextMessage = function (chId,chatId,from,to,botInfo)  {
-  var messages = [{"index":1,"type": "text", "text": "This is demo text message."}];
-
-  return this.applyEnvelop (chId,chatId,from,to,botInfo,messages);
-}
-
-exports.createImageMessage = function (chId,chatId,from,to,botInfo) {
-  var messages = [{ "index": 1,
-            "type": "image",
-            "image": {
-                "preview": "https://placeholdit.imgix.net/~text?txtsize=33&txt=256%C3%97144&w=256&h=144",
-                 "url": "https://placeholdit.imgix.net/~text?txtsize=33&txt=1080×566&w=1080&h=566" } }];
-
-  return this.applyEnvelop (chId,chatId,from,to,botInfo,messages);
-
-}
-exports.createLinkMessage = function (chId,chatId,from,to,botInfo) {
-  var messages =  [{ "index": 1, "type": "link",
-              "link": {
-                "url": "https://placeholdit.imgix.net/~text?txtsize=33&txt=256%C3%97144&w=256&h=144",
-                "target": "def" } }];
-  return this.applyEnvelop (chId,chatId,from,to,botInfo,messages);
-}
-
-exports.createButtonsMessage = function (chId,chatId,from,to,botInfo) {
-
-  var messages = [{ "type": "buttons",
-              "buttons": {
-                  "imageUrl": "https://example.com/bot/images/image.jpg",
-                  "title": "Rome Dream Discount",
-                  "desc": "Exclusive for BBM users. Special discount package for families.",
-                  "actions": [ { "type": "text", "text": { "label": "Discover latest offers", "text": "Discover latest offers" } },
-                               { "type": "postback", "postback": { "label": "Book this offer", "data": "action=book&location=rome&offer=123" } },
-                               { "type": "postback", "postback": { "label": "Summer        catalogue", "data": "season=summer&location=rome" } },
-                               { "type": "link", "link": { "label": "Go to our website", "url": "http://example.com/page/123", "text": "Go to our website" } }
-                        ]}
-                      }];
-
-  return this.applyEnvelop (chId,chatId,from,to,botInfo,messages);
-}
-
-exports.createMenuMessage = function (chId,chatId,from,to,botInfo) {
-  var messages = [
-     { "type": "buttons",
-       "buttons":
-         { "imageUrl": "https://example.com/bot/images/image.jpg",
-           "title": "Menu",
-           "desc": "Please select message type you want to receive",
-           "actions":
-             [ { "type": "text",
-                 "text": { "label": "Text", "text": "text-selected" } },
-               { "type": "image",
-                 "text": { "label": "Image", "text": "image-selected" } },
-               { "type": "image",
-                 "text": { "label": "Link", "text": "link-selected" } },
-               { "type": "image",
-                 "text": { "label": "Buttons", "text": "buttons-selected" } }]
-           }
-     }
-   ];
-  return this.applyEnvelop (chId,chatId,from,to,botInfo,messages);
-
-}
-
-
-/*Dump payload so Demo page can feth later
-* 1. get helloCode from sessions table
-* 2. remove existing records for the helloCode
-* 3. add new payload to table
-*/
-exports.dumpPayload = function (table,chatId,payload) {
-  var session = db.get('sessions[0]').find({chatId:chatId}).value();
-  db.get(table).remove({helloCode:session.helloCode});
-  db.get(table).push({helloCode:session.helloCode,payload:payload}).write();
-}
-
-//do send message to BBM Chat Server
-exports.sendMessage = function (token,mTok,chatId,msg) {
-
-  var url =  process.env.chatServerUrl + "?mTok="+mTok+"&chatId="+chatId;
-  // Start the request
-  request(  getReqOptionsToApiService (url,msg,token) , function (error, response, body) {
-      if (!error && response.statusCode == 200) {
-        console.log ( "200");
+      // Set the headers
+      var headers = {
+          'Accept': 'application/json',
+           'Accept-Encoding': 'gzip',
+           'Content-Type':"applicaiton/x-www-form-urlencoded",
+           "Authorization": "Bearer " + token
       }
-      else { //error , you can decide to resent
-        console.log (response );
-
+      // Configure the request
+      var options = {
+          url: url,
+          method: 'POST',
+          headers: headers,
+          form: body
       }
-
-  })
-}
+      return options;
+    }
