@@ -13,8 +13,10 @@ const adapter = new FileSync('db.json')
 const db = low(adapter)
 
 // Set some defaults
-db.defaults({ clientcredential: [],tokens:[] })
-  .write()
+db.defaults(
+    { clientcredential: [],  //client credential for chatbot
+      token:[]   // token for API call
+    }).write()
 
 
 /**
@@ -47,66 +49,96 @@ db.defaults({ clientcredential: [],tokens:[] })
     return options;
   }
 
+  //
+  /**
+  * internal utility to get Request options to Token Server
+  */
+   getReqOptionsForTokenService = function(url,body,username,password) {
+      var fs = require('fs')
+          , path = require('path')
+          , certFile = path.resolve(__dirname, 'ssl/bbmmobilenews.com_thawte.crt')
+          , keyFile = path.resolve(__dirname, 'ssl/bbmmobilenews.com_thawte.key')  ;
+      //    , caFile = path.resolve(__dirname, 'ssl/ca.cert.pem');
 
-/*
-* provide access token for app to make API call
-* check from db, if, it's expired or not exist make new request from token server
-*/
-exports.getAccessToken = function (bbmid, callback) {
+      // Set the headers
+      var headers = {
+          'Accept': 'application/json',
+           'Accept-Encoding': 'gzip',
+           'Content-Type':"applicaiton/x-www-form-urlencoded",
+           "Authorization": "Basic " + new Buffer( username + ":" + password ).toString('base64')
+      }
+      // Configure the request
+      var options = {
+          url: url,
+          method: 'POST',
+          headers: headers,
+          form: body,
+          cert: fs.readFileSync(certFile),
+          key: fs.readFileSync(keyFile),
+      }
+      return options;
+    }
 
+    //
+    /**
+    * internal utility to get Request options to Partner API
+    */
+    getReqOptionsForApiService = function(url,body,token) {
+        /* var fs = require('fs')
+            , path = require('path')
+             , certFile = path.resolve(__dirname, 'ssl/bbmmobilenews.com_thawte.crt')
+             , keyFile = path.resolve(__dirname, 'ssl/bbmmobilenews.com_thawte.key')  ;
+             , caFile = path.resolve(__dirname, 'ssl/ca.cert.pem');
+          */
 
-   if (db.get('tokens[0]').find({ bbmid:  bbmid }).size().value()) { //token not acquired before
+        // Set the headers
+        var headers = {
+            'Accept': 'application/json',
+             'Accept-Encoding': 'gzip',
+             'Content-Type':"applicaiton/x-www-form-urlencoded",
+             "Authorization": "Bearer " + token
+        }
+        // Configure the request
+        var options = {
+            url: url,
+            method: 'POST',
+            headers: headers,
+            form: body
+        }
+        return options;
+      }
 
+      /*
+      * exchange for long lived token, and store it in db
+      */
+      exports.exchangeToken = function (shortLivedToken,callback) {
 
-   }
-   else { //token acquired, check validity, if expired, make new request
-     token = db.get('tokens[0]').find({ bbmid:  bbmid }).value();
-     if (token && (  Date.now() >  token.ts  + (token.expires_in *1000))  )  {
-       callback (token);
-     }
-     else {
-       console.log('getAccessToken from Token service');
+        console.log('exchangeToken from Token service');
 
-       var params = { grant_type:'client_credentials', scope:'bot'  }
-       var url = "https://auth-beta.bbm.blackberry.com:8443/oauth/token";
-       // Start the request
-       request(getReqOptions(url,params,process.env.username ,process.env.password ), function (error, response, body) {
-           if (!error && response.statusCode == 200) {
-             console.log ( "200");
-             body = JSON.parse (body);
-           //  console.log ( JSON.parse (body).access_token);
-              //store to db
-              var cred = {access_token:body.access_token,refresh_token:body.refresh_token,expire_in:body.expires_in,ts:Date.now()};
-              console.log (cred);
-             db.get('clientcredential')
-               .push(cred)
-               .write();
-               callback (cred);
+        var body = { grant_type:'exchange_token', access_token:shortLivedToken   }
+        var url = "https://auth-beta.bbm.blackberry.com:8443/oauth/token";
+        // Start the request
+        request(getReqOptionsToTokenService(url,body,process.env.username ,process.env.password ), function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+              console.log ( "200");
+              body = JSON.parse (body);
+            //  console.log ( JSON.parse (body).access_token);
+               //store to db
+               var cred = {access_token:body.access_token,refresh_token:body.refresh_token,expire_in:body.expires_in,ts:Date.now()};
+               console.log (cred);
+              db.get('clientcredential')
+                .push(cred)
+                .write();
+                callback (cred);
 
-           }
-           else {
-             console.log (response );
-              callback (error);
-           }
+            }
+            else {
+                console.log (response );
+                callback (error);
+            }
+        })
+      }
 
-       })
-
-     }
-
-   }
-
-
-}
-
-
-/*
-* exchange for long lived token, and store it in db
-*/
-exports.exchangeToken = function (sltoken,callback) {
-
-
-
-}
 
 /*
 * acquire client credential for bot
@@ -121,13 +153,13 @@ exports.getClientCredential = function (callback) {
     var params = { grant_type:'client_credentials', scope:'bot'  }
     var url = "https://auth-beta.bbm.blackberry.com:8443/oauth/token";
     // Start the request
-    request(getReqOptions(url,params), function (error, response, body) {
+    request(utils.getReqOptionsToTokenService(url,params), function (error, response, body) {
         if (!error && response.statusCode == 200) {
           console.log ( "200");
           body = JSON.parse (body);
         //  console.log ( JSON.parse (body).access_token);
            //store to db
-           var cred = {access_token:body.access_token,refresh_token:body.refresh_token,expire_in:body.expires_in,ts:Date.now()};
+           var cred = {accessToken:body.access_token,refreshToken:body.refresh_token,expireIn:body.expires_in,ts:Date.now()};
            console.log (cred);
           db.get('clientcredential')
             .push(cred)
@@ -149,6 +181,54 @@ exports.getClientCredential = function (callback) {
   }
 
 
-/**
-*
-*/
+
+
+  /*
+  * provide access token for app to make Partner API call
+  * check from db, if, it's expired  make new request from token server with refreshtoken
+  */
+  exports.getAccessToken = function (bbmId, callback) {
+
+     if (db.get('tokens[0]').find({ bbmId:  bbmId }).size().value()) { //token not acquired before
+       throw new Error('token not found,in fastoauth at least we should have Long-lived or refresh token');
+     }
+     else { //token acquired, check validity, if expired, make new request
+       token = db.get('tokens[0]').find({ bbmId:  bbmId }).value();
+       if (token && (  Date.now() >  token.ts  + (token.expiresIn * 1000))  )  {
+         callback (token);
+       }
+       else {
+         console.log('getAccessToken with refresh token');
+
+         var body = { grant_type:'refresh_token', scope:'v1'  }
+         var url = "https://auth-beta.bbm.blackberry.com:8443/oauth/token";
+         // Start the request
+         request(getReqOptionsForTokenService(url,body,process.env.username ,process.env.password ), function (error, response, body) {
+             if (!error && response.statusCode == 200) {
+               console.log ( "200");
+               body = JSON.parse (body);
+             //  console.log ( JSON.parse (body).access_token);
+                //store to db
+                var cred = {bbmId:bbmId, accessToken:body.access_token,refreshToken:body.refresh_token,expireIn:body.expires_in,ts:Date.now()};
+                console.log (cred);
+                //delete existing expired token
+
+
+                 db.get('tokens[0]').remove({ bbmId:  bbmId }).write();
+                 db.get('tokens').push(cred).write();
+                 callback (cred);
+
+             }
+             else {
+               console.log (response );
+                callback (error);
+             }
+
+         })
+
+       }
+
+     }
+
+
+  }

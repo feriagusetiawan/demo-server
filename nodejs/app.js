@@ -4,7 +4,7 @@ var express = require("express");
 var bodyParser = require('body-parser');
 var request = require('request');
 var auth = require('./auth');
-
+var auth = require('./utils');
 
 var app = express();
 app.use(bodyParser.json({ type: 'application/json' }));
@@ -13,7 +13,14 @@ var router = express.Router();
 var path = __dirname + '/views/';
 
 var username = process.env.username; //your username
-var pasword =process.env.password; //client secreet
+var pasword = process.env.password; //client secreet
+var provision = {chId: "C00132297",
+                  bbmId:"3175533613684883456",
+                  botInfo: {"3175533613684883456": {
+                                      "name": "Demo Bot",
+                                    }
+                                  }
+      }
 
 //init the db
 const low = require('lowdb')
@@ -114,92 +121,97 @@ router.post('/requestLLT', function(req, res) {
     });
 
 
-     //request comes from Chatbot demo page, asking for refresh payload between chat exchange
-    router.get('/chat/incomings/:helloCode', function(req, res) {
-         res.json(db.get('incomings').find({helloCode:req.params.helloCode}).value);
-          db.get('incomings').remove({helloCode:req.params.helloCode});
-      });
-      //request comes from Chatbot demo page, asking for refresh payload between chat exchange
-     router.get('/chat/outgoings/:helloCode', function(req, res) {
-          res.json(db.get('outgoings').find({helloCode:req.params.helloCode}).value);
-           db.get('outgoings').remove({helloCode:req.params.helloCode});
-       });
+/*===================================
+*Request from BBM Demo Landing Page
+* ====================================
+*/
 
-   //request comes from Chatbot demo page, asking for hello "random" code
-   //we will generate 4 digit random number
-   //this opportunity to acquire access token, if not done so
-   router.get('/chat/hello', function(req, res) {
+//request comes from Chatbot Demo landing page, asking for hello "random" code
+//we will generate 5 digit random number
+//this opportunity to acquire access token, if not done so
+router.get('/chat/hello', function(req, res) {
 
-      res.json ( {title:'hello...'});
+   res.json ( {helloCode:'12345'});
 
 
+  });
+
+   // Get latest incoming payload
+  router.get('/chat/incomings/:helloCode', function(req, res) {
+       res.json(db.get('incomings').find({helloCode:req.params.helloCode}).value);
+        db.get('incomings').remove({helloCode:req.params.helloCode});
+    });
+    //the latest outgoing payload
+   router.get('/chat/outgoings/:helloCode', function(req, res) {
+        res.json(db.get('outgoings').find({helloCode:req.params.helloCode}).value);
+         db.get('outgoings').remove({helloCode:req.params.helloCode});
      });
 
-    getHelloCodeByChat = function (chatId) {
-        var session = db.get('sessions[0]').find('chatId':chatId).value;
-        return session.helloCode;
 
-     }
-    /* message from BBM Chat server, user have sent something
-    * 1. check if the user have been idenitified
-    * 2. if no, parse the message look for "Hello"
-    * 3. if yes, present user with button message for various scenarios
+
+
+
+    /* =====================================================
+    * This is how we handled message from BBM Chat server, our callback URL is /chat
+    * 1. always find if we have check if the user have session before (chatID is in the DB)
+    * 2. if no, parse the message look for "HelloCode", and associate HelloCode with ChatID
+    * 3. if yes, parse the message present user with response for various scenarios
+    * ======================================================
     */
-    router.get('/chat', function(req, res) {
+    router.get('/chat/v1/chats', function(req, res) {
+      //always return with 200 to ack
+      res.code = 200;
+      //as best practice, send 'typing...' notification
 
-      if (body.messages.length > 0 && body.messages[0].toLowerCase().startsWith()=='hello' ) {
-          var helloCode = body.messages[0].slice(-4);
+      //now prepare the response based on what is coming ..
+
+      //if new session, establish association first
+      if(  db.get('sessions[0]').find({ chatId:  req.body.chatId }).size().value()==0 ) {
+        //we are expecting user typed in Hello <5 digit hello-code>
+          var helloCode = req.body.messages[0].trim().slice(-5);
           db.get('sessions').push({helloCode:helloCode,chatId:req.body.chatId}).write();
       }
-      else {
-           db.get('incomings').push({helloCode:getHelloCodeByChat(req.body.chatId), body:req.body ).write();
-           
 
-      }
+      var inMsg = req.body.messages[0].trim();
+      var outMsg = {};
 
+      switch(inMsg) {
+      case "text-selected":
+          var messageType = {'type'};
+          outMsg = utils.createTextMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
+          break;
+      case "image-selected":
+          outMsg = utils.createImageMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
+          break;
+      case "link-selected":
+          outMsg = utils.createLinkMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
+          break;
+      case "buttons-selected":
+          outMsg = utils.createButtonsMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
+          break;
+      default:
+          outMsg = utils.createMenuMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
+          break;
 
+      //get credential, then send message
+      auth.getClientCredential (function (cred){
+           utils.sendMessage (cred.accessToken,req.body.mTok,req.body.chatId,outMsg);
+           //dump the payload
+            utils.dumpPayload ("outgoings",req.body.chatId, outMsg) ;
 
+      });
 
      });
 
-     //user select "Send Text Message"
-     //lets say something
-     router.get('/chat/send-message-text', function(req, res) {
 
+     /* =====================================================
+     * This is our simulated postback handler
+     * we just dump the payload to database, so the Demo Landing page can fetch
+     * ======================================================
+     */
+     router.post('/chat/postback', function(req, res) {
+       utils.dumpPayload ("incomings",req.body.chatId,req.body) ;
       });
-      //user select "Send Image Message"
-      //lets say something
-      router.get('/chat/send-message-image', function(req, res) {
-        auth.getClientCredential (function (cred){
-          res.json (cred);
-        });
-
-       });
-       //user select "Send Link Message"
-       //lets say something
-       router.get('/chat/send-message-link', function(req, res) {
-
-        });
-        //user select "Send Link Message"
-        //lets say something
-        router.get('/chat/send-message-link', function(req, res) {
-
-         });
-         //user select "Send Multiple Message"
-         //lets say something
-         router.get('/chat/send-multi-message', function(req, res) {
-
-          });
-         //user select "Send Notification"
-         //lets say something
-         router.get('/chat/send-notification', function(req, res) {
-
-          });
-        //user have responded fron our demo link or button callback
-        //just push the received message to demo page
-        router.get('/chat/user-responded', function(req, res) {
-
-         });
 
 
 
