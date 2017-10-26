@@ -15,7 +15,7 @@ const db = low(adapter)
 // Set some defaults
 db.defaults(
     { clientcredential: [],  //client credential for chatbot
-      token:[]   // token for API call
+      token:[]   // token for API call, one record for each bbmId
     }).write()
 
 
@@ -51,7 +51,7 @@ db.defaults(
 
   //
   /**
-  * internal utility to get Request options to Token Server
+  * internal utility to get Request options for accessing Token Server
   */
    getReqOptionsForTokenService = function(url,body,username,password) {
       var fs = require('fs')
@@ -81,7 +81,7 @@ db.defaults(
 
     //
     /**
-    * internal utility to get Request options to Partner API
+    * internal utility to get Request options for accessing Partner API
     */
     getReqOptionsForApiService = function(url,body,token) {
         /* var fs = require('fs')
@@ -185,7 +185,7 @@ exports.getClientCredential = function (callback) {
 
   /*
   * provide access token for app to make Partner API call
-  * check from db, if, it's expired  make new request from token server with refreshtoken
+  * check from db, if it's expired  make new request from token server with refreshtoken
   */
   exports.getAccessToken = function (bbmId, callback) {
 

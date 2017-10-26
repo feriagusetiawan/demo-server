@@ -177,7 +177,7 @@ router.get('/chat/hello', function(req, res) {
 
       switch(inMsg) {
       case "text-selected":
-          var messageType = {'type'};
+
           outMsg = utils.createTextMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
           break;
       case "image-selected":
@@ -192,6 +192,7 @@ router.get('/chat/hello', function(req, res) {
       default:
           outMsg = utils.createMenuMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
           break;
+        }  
 
       //get credential, then send message
       auth.getClientCredential (function (cred){
