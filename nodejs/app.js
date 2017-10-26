@@ -112,7 +112,7 @@ router.post('/requestLLT', function(req, res) {
   * 5 respond to chat message
   */
 
-  router.get('/test/clientcred', function(req, res) {
+  router.get('/chat/test/clientcred', function(req, res) {
 
       auth.getClientCredential (function (cred){
         res.json (cred);
@@ -192,7 +192,7 @@ router.get('/chat/hello', function(req, res) {
       default:
           outMsg = utils.createMenuMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
           break;
-        }  
+        }
 
       //get credential, then send message
       auth.getClientCredential (function (cred){
