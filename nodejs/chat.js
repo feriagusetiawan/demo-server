@@ -83,7 +83,7 @@ exports.replyMessage = function (req,res) {
 //do send message to BBM Chat Server
 sendMessage = function (token,mTok,chatId,msg) {
 
-  var url =  process.env.chatServerUrl + "/" +chatId+ "?mTok="+mTok;
+  var url =  process.env.chatServerUrl + chatId+ "?mTok="+  encodeURIComponent(mTok);
   console.log ('do sending to ' + url);
   // Start the request
   request(  utils.getReqOptionsForApiService (url,msg,token) , function (error, response, body) {
@@ -91,7 +91,7 @@ sendMessage = function (token,mTok,chatId,msg) {
         console.log ( "200");
       }
       else { //error , you can decide to resent
-        console.log (response );
+        console.log (error);
 
       }
 

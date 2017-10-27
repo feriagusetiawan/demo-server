@@ -121,6 +121,7 @@ const db = low(adapter)
 
       }
             */
+      res.code = 200;      
       chat.replyMessage (req,res);
 
 
