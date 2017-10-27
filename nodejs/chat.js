@@ -3,6 +3,7 @@ var bodyParser = require('body-parser');
 var request = require('request');
 
 var utils = require('./utils');
+var auth = require('./auth');
 
 //init the db
 const low = require('lowdb')
@@ -34,31 +35,35 @@ exports.replyMessage = function (req,res) {
   //now prepare the response based on what is coming ..
 
   //if new session, establish association first
-  if(  db.get('sessions[0]').find({ chatId:  req.body.chatId }).size().value()==0 ) {
+
+  /*if(  db.get('sessions[0]').find({ chatId:  req.body.chatId }).size().value()==0 ) {
     //we are expecting user typed in Hello <5 digit hello-code>
       var helloCode = req.body.messages[0].trim().slice(-5);
       db.get('sessions').push({helloCode:helloCode,chatId:req.body.chatId}).write();
-  }
 
-  var inMsg = req.body.messages[0].trim();
+  }
+  */
+
+//  var inMsg = req.body.messages[0].trim();
+ var inMsg = 'text-selected';
   var outMsg = {};
 
   switch(inMsg) {
   case "text-selected":
 
-      outMsg = utils.createTextMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
+      outMsg =  createTextMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
       break;
   case "image-selected":
-      outMsg = utils.createImageMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
+      outMsg =  createImageMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
       break;
   case "link-selected":
-      outMsg = utils.createLinkMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
+      outMsg =  createLinkMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
       break;
   case "buttons-selected":
-      outMsg = utils.createButtonsMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
+      outMsg =  createButtonsMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
       break;
   default:
-      outMsg = utils.createMenuMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
+      outMsg =  createMenuMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
       break;
     }
 
@@ -77,7 +82,7 @@ sendMessage = function (token,mTok,chatId,msg) {
 
   var url =  process.env.chatServerUrl + "?mTok="+mTok+"&chatId="+chatId;
   // Start the request
-  request(  utils.getReqOptionsToApiService (url,msg,token) , function (error, response, body) {
+  request(  utils.getReqOptionsForApiService (url,msg,token) , function (error, response, body) {
       if (!error && response.statusCode == 200) {
         console.log ( "200");
       }
@@ -89,7 +94,7 @@ sendMessage = function (token,mTok,chatId,msg) {
   })
 }
 
-applyEnvelope = function (chId,chatId,from,to,botInfo, messages) {
+applyEnvelop = function (chId,chatId,from,to,botInfo, messages) {
     var msg = {
           "mType": "bot",
           "chId": chId,
@@ -109,7 +114,7 @@ applyEnvelope = function (chId,chatId,from,to,botInfo, messages) {
 createTextMessage = function (chId,chatId,from,to,botInfo)  {
   var messages = [{"index":1,"type": "text", "text": "This is demo text message."}];
 
-  return this.applyEnvelop (chId,chatId,from,to,botInfo,messages);
+  return  applyEnvelop (chId,chatId,from,to,botInfo,messages);
 }
 
 createImageMessage = function (chId,chatId,from,to,botInfo) {
@@ -119,7 +124,7 @@ createImageMessage = function (chId,chatId,from,to,botInfo) {
                 "preview": "https://placeholdit.imgix.net/~text?txtsize=33&txt=256%C3%97144&w=256&h=144",
                  "url": "https://placeholdit.imgix.net/~text?txtsize=33&txt=1080×566&w=1080&h=566" } }];
 
-  return this.applyEnvelop (chId,chatId,from,to,botInfo,messages);
+  return  applyEnvelop (chId,chatId,from,to,botInfo,messages);
 
 }
 createLinkMessage = function (chId,chatId,from,to,botInfo) {
@@ -127,7 +132,7 @@ createLinkMessage = function (chId,chatId,from,to,botInfo) {
               "link": {
                 "url": "https://placeholdit.imgix.net/~text?txtsize=33&txt=256%C3%97144&w=256&h=144",
                 "target": "def" } }];
-  return this.applyEnvelop (chId,chatId,from,to,botInfo,messages);
+  return  applyEnvelop (chId,chatId,from,to,botInfo,messages);
 }
 
 createButtonsMessage = function (chId,chatId,from,to,botInfo) {
@@ -144,7 +149,7 @@ createButtonsMessage = function (chId,chatId,from,to,botInfo) {
                         ]}
                       }];
 
-  return this.applyEnvelop (chId,chatId,from,to,botInfo,messages);
+  return applyEnvelop (chId,chatId,from,to,botInfo,messages);
 }
 
 createMenuMessage = function (chId,chatId,from,to,botInfo) {
@@ -186,7 +191,8 @@ getHelloCodeByChat = function (chatId) {
 * 3. add new payload to table
 */
 dumpPayload = function (table,chatId,payload) {
-  var session = db.get('sessions[0]').find({chatId:chatId}).value();
+/*  var session = db.get('sessions[0]').find({chatId:chatId}).value();
   db.get(table).remove({helloCode:session.helloCode});
   db.get(table).push({helloCode:session.helloCode,payload:payload}).write();
+  */
 }
