@@ -68,7 +68,7 @@ exports.replyMessage = function (req,res) {
       break;
     }
 
-  console.console.log(outMsg);
+  console.log(outMsg);
   //get credential, then send message
   auth.getClientCredential (function (cred){
         console.log ('sending message now with token ' + cred.accessToken);
@@ -83,7 +83,7 @@ exports.replyMessage = function (req,res) {
 //do send message to BBM Chat Server
 sendMessage = function (token,mTok,chatId,msg) {
 
-  var url =  process.env.chatServerUrl + "?mTok="+mTok+"&chatId="+chatId;
+  var url =  process.env.chatServerUrl + "/" +chatId+ "?mTok="+mTok;
   console.log ('do sending to ' + url);
   // Start the request
   request(  utils.getReqOptionsForApiService (url,msg,token) , function (error, response, body) {
