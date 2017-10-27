@@ -93,7 +93,7 @@ const db = low(adapter)
     *
     * ======================================================
     */
-    router.get('/chat/v1/chats', function(req, res) {
+    router.post('/chat/v1/chats', function(req, res) {
 
       //For this demo, we need to identify the user by means of Hello code
       //this is the 5 digit code that user will get from Demo website

@@ -51,24 +51,27 @@ exports.replyMessage = function (req,res) {
   switch(inMsg) {
   case "text-selected":
 
-      outMsg =  createTextMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
+      outMsg =  createTextMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo);
+
       break;
   case "image-selected":
-      outMsg =  createImageMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
+      outMsg =  createImageMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo);
       break;
   case "link-selected":
-      outMsg =  createLinkMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
+      outMsg =  createLinkMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo);
       break;
   case "buttons-selected":
-      outMsg =  createButtonsMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
+      outMsg =  createButtonsMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo);
       break;
   default:
-      outMsg =  createMenuMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
+      outMsg =  createMenuMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo);
       break;
     }
 
+  console.console.log(outMsg);
   //get credential, then send message
   auth.getClientCredential (function (cred){
+        console.log ('sending message now with token ' + cred.accessToken);
         sendMessage (cred.accessToken,req.body.mTok,req.body.chatId,outMsg);
        //dump the payload
         dumpPayload ("outgoings",req.body.chatId, outMsg) ;
@@ -81,6 +84,7 @@ exports.replyMessage = function (req,res) {
 sendMessage = function (token,mTok,chatId,msg) {
 
   var url =  process.env.chatServerUrl + "?mTok="+mTok+"&chatId="+chatId;
+  console.log ('do sending to ' + url);
   // Start the request
   request(  utils.getReqOptionsForApiService (url,msg,token) , function (error, response, body) {
       if (!error && response.statusCode == 200) {

@@ -61,6 +61,8 @@ db.defaults(
 */
 exports.getClientCredential = function (callback) {
 
+    console.log ('getting client cred... ');
+
   //check if we have access token, otherwise get it now
   if(db.get('clientcredential').size().value()==0) {
     console.log('getClientCredential from Token service');
