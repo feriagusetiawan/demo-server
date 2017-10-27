@@ -116,7 +116,7 @@ applyEnvelop = function (chId,chatId,from,to,botInfo, messages) {
 
 
 createTextMessage = function (chId,chatId,from,to,botInfo)  {
-  var messages = [{"index":1,"type": "text", "text": "This is demo text message."}];
+  var messages[] = {"index":1,"type": "text", "text": "This is demo text message."};
 
   return  applyEnvelop (chId,chatId,from,to,botInfo,messages);
 }

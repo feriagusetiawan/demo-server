@@ -121,7 +121,7 @@ const db = low(adapter)
 
       }
             */
-      res.code = 200;      
+      res.json(200,{status:"ok"})
       chat.replyMessage (req,res);
 
 

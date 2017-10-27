@@ -75,8 +75,6 @@ exports.getClientCredential = function (callback) {
           console.log ( "200");
           body = JSON.parse (body);
 
-
-
         //  console.log ( JSON.parse (body).access_token);
            //store to db
            var cred = {accessToken:body.access_token,refreshToken:body.refresh_token,expiresIn:body.expires_in,ts:Date.now()};
