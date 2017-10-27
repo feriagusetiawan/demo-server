@@ -1,5 +1,8 @@
 
 
+var rand = require("random-key");
+
+
 //
 /**
 * internal utility to get Request options for accessing Token Server
@@ -36,7 +39,7 @@
   /**
   * internal utility to get Request options for accessing Partner API
   */
-  exports.getReqOptionsForApiService = function(url,body,token) {
+  exports.getReqOptionsForApiService = function(url,method,body,token) {
       /* var fs = require('fs')
           , path = require('path')
            , certFile = path.resolve(__dirname, 'ssl/bbmmobilenews.com_thawte.crt')
@@ -54,9 +57,36 @@
       // Configure the request
       var options = {
           url: url,
-          method: 'POST',
+          method: method,
           headers: headers,
           form: body
       }
       return options;
+    }
+
+    exports.createUser = function (bbmId,accessToken,refreshToken,tokenExpiresIn) {
+        var user = {
+              id: rand.generate(),
+              bbmId:bbmId,
+              accessToken:accessToken,
+              refreshToken:refreshToken,
+              tokenExpiresIn:tokenExpiresIn,
+              ts:Date.now()
+            };
+            db.get('users').push(user).write();
+           return user;
+    }
+
+    exports.updateUser = function (id,accessToken,refreshToken,tokenExpiresIn) {
+      db.get('users')
+          .find({id:id})
+          .assign({accessToken:accessToken,refreshToken:refreshToken,tokenExpiresIn:tokenExpiresIn,
+                    ts:Date.now()}).write();
+
+    }
+    exports.getUser = function (id) {
+    //  if (db.get('users').find({ id:  id }).size()>0 )
+        return db.get('users[0]').find({ id:  id }).value();
+    //  else
+      //  return null;
     }

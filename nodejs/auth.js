@@ -6,6 +6,7 @@
 var bodyParser = require('body-parser');
 var request = require('request');
 
+
 var utils = require('./utils');
 
 //init the db
@@ -71,9 +72,12 @@ exports.getClientCredential = function (callback) {
         if (!error && response.statusCode == 200) {
           console.log ( "200");
           body = JSON.parse (body);
+
+
+
         //  console.log ( JSON.parse (body).access_token);
            //store to db
-           var cred = {accessToken:body.access_token,refreshToken:body.refresh_token,expireIn:body.expires_in,ts:Date.now()};
+           var cred = {accessToken:body.access_token,refreshToken:body.refresh_token,expiresIn:body.expires_in,ts:Date.now()};
            console.log (cred);
           db.get('clientcredential')
             .push(cred)
@@ -123,7 +127,7 @@ exports.getClientCredential = function (callback) {
                body = JSON.parse (body);
              //  console.log ( JSON.parse (body).access_token);
                 //store to db
-                var cred = {bbmId:bbmId, accessToken:body.access_token,refreshToken:body.refresh_token,expireIn:body.expires_in,ts:Date.now()};
+                var cred = {bbmId:bbmId, accessToken:body.access_token,refreshToken:body.refresh_token,expiresIn:body.expires_in,ts:Date.now()};
                 console.log (cred);
                 //delete existing expired token
                  db.get('tokens[0]').remove({ bbmId:  bbmId }).write();
@@ -147,6 +151,8 @@ exports.getClientCredential = function (callback) {
 
   /*
   * exchange for long lived token, and store it in db
+  *if the session already associated with users, update the token
+  *otherwise create new user
   */
   exports.exchangeToken = function (shortLivedToken,callback) {
 
@@ -159,19 +165,11 @@ exports.getClientCredential = function (callback) {
         if (!error && response.statusCode == 200) {
           console.log ( "200");
           body = JSON.parse (body);
-        //  console.log ( JSON.parse (body).access_token);
-           //store to db
-           var cred = {access_token:body.access_token,refresh_token:body.refresh_token,expire_in:body.expires_in,ts:Date.now()};
-           console.log (cred);
-          db.get('clientcredential')
-            .push(cred)
-            .write();
-            callback (cred);
-
+            callback (body);
         }
         else {
-            console.log (response );
-            callback (error);
+          callback (error);
         }
-    })
+
+    });
   }

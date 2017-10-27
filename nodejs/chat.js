@@ -1,7 +1,79 @@
 
+var bodyParser = require('body-parser');
+var request = require('request');
+
+var utils = require('./utils');
+
+//init the db
+const low = require('lowdb')
+const FileSync = require('lowdb/adapters/FileSync')
+
+const adapter = new FileSync('db.json')
+const db = low(adapter)
+
+var provision = {chId: "C00132297",
+                  bbmId:"3175533613684883456",
+                  botInfo: {"3175533613684883456": {
+                                      "name": "Demo Bot",
+                                    }
+                                  }
+                    }
+
+
+  /*This is how we handled message from BBM Chat server
+  * 1. always find if we have check if the user have session before (chatID is in the DB)
+  * 2. if no, parse the message look for "HelloCode", and associate HelloCode with ChatID
+  * 3. if yes, parse the message present user with response for various scenarios
+  */
+
+exports.replyMessage = function (req,res) {
+  //always return with 200 to ack
+  res.code = 200;
+  //as best practice, send 'typing...' notification
+
+  //now prepare the response based on what is coming ..
+
+  //if new session, establish association first
+  if(  db.get('sessions[0]').find({ chatId:  req.body.chatId }).size().value()==0 ) {
+    //we are expecting user typed in Hello <5 digit hello-code>
+      var helloCode = req.body.messages[0].trim().slice(-5);
+      db.get('sessions').push({helloCode:helloCode,chatId:req.body.chatId}).write();
+  }
+
+  var inMsg = req.body.messages[0].trim();
+  var outMsg = {};
+
+  switch(inMsg) {
+  case "text-selected":
+
+      outMsg = utils.createTextMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
+      break;
+  case "image-selected":
+      outMsg = utils.createImageMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
+      break;
+  case "link-selected":
+      outMsg = utils.createLinkMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
+      break;
+  case "buttons-selected":
+      outMsg = utils.createButtonsMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
+      break;
+  default:
+      outMsg = utils.createMenuMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo)
+      break;
+    }
+
+  //get credential, then send message
+  auth.getClientCredential (function (cred){
+        sendMessage (cred.accessToken,req.body.mTok,req.body.chatId,outMsg);
+       //dump the payload
+        dumpPayload ("outgoings",req.body.chatId, outMsg) ;
+
+  });
+
+}
 
 //do send message to BBM Chat Server
-exports.sendMessage = function (token,mTok,chatId,msg) {
+sendMessage = function (token,mTok,chatId,msg) {
 
   var url =  process.env.chatServerUrl + "?mTok="+mTok+"&chatId="+chatId;
   // Start the request
@@ -17,16 +89,7 @@ exports.sendMessage = function (token,mTok,chatId,msg) {
   })
 }
 
-
-//some utilities function
-  exports.getHelloCodeByChat = function (chatId) {
-      var session = db.get('sessions[0]').find({'chatId':chatId}).value();
-      return session.helloCode;
-
-   }
-
-
-  exports.applyEnvelope = function (chId,chatId,from,to,botInfo, messages) {
+applyEnvelope = function (chId,chatId,from,to,botInfo, messages) {
     var msg = {
           "mType": "bot",
           "chId": chId,
@@ -43,13 +106,13 @@ exports.sendMessage = function (token,mTok,chatId,msg) {
 
 
 
-exports.createTextMessage = function (chId,chatId,from,to,botInfo)  {
+createTextMessage = function (chId,chatId,from,to,botInfo)  {
   var messages = [{"index":1,"type": "text", "text": "This is demo text message."}];
 
   return this.applyEnvelop (chId,chatId,from,to,botInfo,messages);
 }
 
-exports.createImageMessage = function (chId,chatId,from,to,botInfo) {
+createImageMessage = function (chId,chatId,from,to,botInfo) {
   var messages = [{ "index": 1,
             "type": "image",
             "image": {
@@ -59,7 +122,7 @@ exports.createImageMessage = function (chId,chatId,from,to,botInfo) {
   return this.applyEnvelop (chId,chatId,from,to,botInfo,messages);
 
 }
-exports.createLinkMessage = function (chId,chatId,from,to,botInfo) {
+createLinkMessage = function (chId,chatId,from,to,botInfo) {
   var messages =  [{ "index": 1, "type": "link",
               "link": {
                 "url": "https://placeholdit.imgix.net/~text?txtsize=33&txt=256%C3%97144&w=256&h=144",
@@ -67,7 +130,7 @@ exports.createLinkMessage = function (chId,chatId,from,to,botInfo) {
   return this.applyEnvelop (chId,chatId,from,to,botInfo,messages);
 }
 
-exports.createButtonsMessage = function (chId,chatId,from,to,botInfo) {
+createButtonsMessage = function (chId,chatId,from,to,botInfo) {
 
   var messages = [{ "type": "buttons",
               "buttons": {
@@ -84,7 +147,7 @@ exports.createButtonsMessage = function (chId,chatId,from,to,botInfo) {
   return this.applyEnvelop (chId,chatId,from,to,botInfo,messages);
 }
 
-exports.createMenuMessage = function (chId,chatId,from,to,botInfo) {
+createMenuMessage = function (chId,chatId,from,to,botInfo) {
   var messages = [
      { "type": "buttons",
        "buttons":
@@ -103,9 +166,18 @@ exports.createMenuMessage = function (chId,chatId,from,to,botInfo) {
            }
      }
    ];
-  return this.applyEnvelop (chId,chatId,from,to,botInfo,messages);
+  return  applyEnvelop (chId,chatId,from,to,botInfo,messages);
 
 }
+
+
+//some utilities function
+getHelloCodeByChat = function (chatId) {
+      var session = db.get('sessions[0]').find({'chatId':chatId}).value();
+      return session.helloCode;
+
+   }
+
 
 
 /*Dump payload so Demo page can feth later
@@ -113,7 +185,7 @@ exports.createMenuMessage = function (chId,chatId,from,to,botInfo) {
 * 2. remove existing records for the helloCode
 * 3. add new payload to table
 */
-exports.dumpPayload = function (table,chatId,payload) {
+dumpPayload = function (table,chatId,payload) {
   var session = db.get('sessions[0]').find({chatId:chatId}).value();
   db.get(table).remove({helloCode:session.helloCode});
   db.get(table).push({helloCode:session.helloCode,payload:payload}).write();
