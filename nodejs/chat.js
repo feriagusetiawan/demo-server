@@ -86,7 +86,7 @@ sendMessage = function (token,mTok,chatId,msg) {
   var url =  process.env.chatServerUrl + chatId+ "?mTok="+  encodeURIComponent(mTok);
   console.log ('do sending to ' + url);
   // Start the request
-  request(  utils.getReqOptionsForApiService (url,msg,token) , function (error, response, body) {
+  request(  utils.getReqOptionsForApiService (url,'POST',msg,token) , function (error, response, body) {
       if (!error && response.statusCode == 200) {
         console.log ( "200");
       }
