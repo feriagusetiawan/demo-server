@@ -48,7 +48,7 @@ const db = low(adapter)
       auth.exchangeToken (req.body.token,function (cred) {
         //put into session so we can retrieve back when needed to call api
         req.session.cred  =  cred;
-        res.code = 200;
+        res.json ({status:'ok'})
       });
      });
 
@@ -56,10 +56,9 @@ const db = low(adapter)
      //client request for user profile
      router.get('/api/userProfile', function(req, res) {
        if (req.session.cred===undefined) {
-         res.code = 403;
-         return;
+             res.json ({status:'pls exchange token first'})
        }
-       api.getUserProfile (req.session.cred.access_token,function (body) {
+       else api.getUserProfile (req.session.cred.access_token,function (body) {
           res.json (body);
        });
       });
