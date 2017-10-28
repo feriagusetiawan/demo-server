@@ -68,7 +68,7 @@ exports.replyMessage = function (req,res) {
       break;
     }
 
-  console.log(outMsg);
+
   //get credential, then send message
   auth.getClientCredential (function (cred){
         console.log ('sending message now with token ' + cred.accessToken);
@@ -116,7 +116,7 @@ applyEnvelop = function (chId,chatId,from,to,botInfo, messages) {
 
 
 createTextMessage = function (chId,chatId,from,to,botInfo)  {
-  var messages[] = {"index":1,"type": "text", "text": "This is demo text message."};
+  var messages = [{"index":1,"type": "text", "text": "This is demo text message."}];
 
   return  applyEnvelop (chId,chatId,from,to,botInfo,messages);
 }
