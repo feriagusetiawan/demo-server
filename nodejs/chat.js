@@ -45,7 +45,7 @@ exports.replyMessage = function (req,res) {
   */
 
 //  var inMsg = req.body.messages[0].trim();
- var inMsg = 'image-selected';
+ var inMsg = 'text-selected';
   var outMsg = {};
 
   switch(inMsg) {
@@ -88,7 +88,7 @@ sendMessage = function (token,mTok,chatId,msg) {
   // Start the request
   request(  utils.getReqOptionsForApiService (url,'POST',msg,token) , function (error, response, body) {
       if (!error && response.statusCode == 200) {
-        console.log ("200");
+        console.log (response);
       }
       else { //error , you can decide to resent
         console.log (response);
@@ -148,6 +148,7 @@ createButtonsMessage = function (chId,chatId,from,to,botInfo) {
                   "desc": "Exclusive for BBM users. Special discount package for families.",
                   "actions": [ { "type": "text", "text": { "label": "Discover latest offers", "text": "Discover latest offers" } },
                                { "type": "postback", "postback": { "label": "Book this offer", "data": "action=book&location=rome&offer=123" } },
+                               { "type": "postback", "postback": { "label": "Summer        catalogue", "data": "season=summer&location=rome" } },
                                { "type": "link", "link": { "label": "Go to our website", "url": "http://example.com/page/123", "text": "Go to our website" } }
                         ]}
                       }];
