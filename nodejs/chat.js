@@ -45,7 +45,7 @@ exports.replyMessage = function (req,res) {
   */
 
 //  var inMsg = req.body.messages[0].trim();
- var inMsg = 'button-selected';
+ var inMsg = 'image-selected';
   var outMsg = {};
 
   switch(inMsg) {
