@@ -150,12 +150,11 @@ createButtonsMessage = function (chId,chatId,from,to,botInfo) {
   var messages = [{ "type": "buttons",
               "buttons": {
                   "imageUrl": "https://example.com/bot/images/image.jpg",
-                  "title": "Rome Dream Discount",
-                  "desc": "Exclusive for BBM users. Special discount package for families.",
-                  "actions": [ { "type": "text", "text": { "label": "Discover latest offers", "text": "Discover latest offers" } },
-                               { "type": "postback", "postback": { "label": "Book this offer", "data": "action=book&location=rome&offer=123" } },
-                               { "type": "postback", "postback": { "label": "Summer catalogue", "data": "season=summer&location=rome" } },
-                               { "type": "link", "link": { "label": "Go to our website", "url": "https://demobbm.com/demo-client/chat/", "text": "Go to our website" } }
+                  "title": "Buttons Example",
+                  "desc": "You can have up 4 buttons, with 3 diff types (text,link and postback)",
+                  "actions": [ { "type": "text", "text": { "label": "Text Example", "text": "Button Text" } },
+                               { "type": "postback", "postback": { "label": "Postback example", "data": "action=myaction&param1=value1&param2=value2" } },
+                               { "type": "link", "link": { "label": "Link Example", "url": "https://demobbm.com/demo-client/chat/", "text": "Go to our website" } }
                         ]}
                       }];
 
