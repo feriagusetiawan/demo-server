@@ -1,12 +1,18 @@
 require('dotenv').load();
 
 var express = require("express");
-var bodyParser = require('body-parser');
+
 var request = require('request');
+var bodyParser = require('body-parser');
 var session = require('express-session');
 var auth = require('./auth');
 var chat = require('./chat');
 var utils = require('./utils');
+
+// create application/json parser
+var jsonParser = bodyParser.json()
+// create application/x-www-form-urlencoded parser
+var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
 var app = express();
 app.use(bodyParser.json({ type: 'application/json' }));
@@ -34,8 +40,6 @@ const adapter = new FileSync('db.json')
 const db = low(adapter)
 
 
-
-
     /* =====================================================
     * Handle request for fastoauth and calling partner api
     *
@@ -44,7 +48,8 @@ const db = low(adapter)
 
     //client send Shortlived token, and we should exchange with long lived,
     //map it with and store in our db
-    router.get('/fastoauth/exchangeToken', function(req, res) {
+    router.get('/fastoauth/exchangeToken',jsonParser, function(req, res) {
+      console.log ('exchanging token for ' + req.body.token);
       auth.exchangeToken (req.body.token,function (cred) {
         //put into session so we can retrieve back when needed to call api
         req.session.cred  =  cred;
@@ -54,7 +59,7 @@ const db = low(adapter)
 
 
      //client request for user profile
-     router.get('/api/userProfile', function(req, res) {
+     router.get('/api/userProfile', jsonParser, function(req, res) {
        if (req.session.cred===undefined) {
              res.json ({status:'pls exchange token first'})
        }
@@ -64,7 +69,7 @@ const db = low(adapter)
       });
 
      //client request for contact list
-     router.get('/api/contacts', function(req, res) {
+     router.get('/api/contacts', jsonParser, function(req, res) {
        if (req.session.cred===undefined) {
          res.code = 403;
          return;
@@ -76,7 +81,7 @@ const db = low(adapter)
       });
 
       //client request to post to feed
-      router.post('/api/post2Feed', function(req, res) {
+      router.post('/api/post2Feed',jsonParser,  function(req, res) {
         if (req.session.cred===undefined) {
           res.code = 403;
           return;
@@ -92,7 +97,7 @@ const db = low(adapter)
     *
     * ======================================================
     */
-    router.post('/chat/v1/chats', function(req, res) {
+    router.post('/chat/v1/chats', jsonParser,  function(req, res) {
 
       //For this demo, we need to identify the user by means of Hello code
       //this is the 5 digit code that user will get from Demo website
@@ -113,11 +118,7 @@ const db = low(adapter)
           else {
               //ask user to enter hello code from website
 
-
           }
-
-
-
       }
             */
       res.json(200,{status:"ok"})
@@ -132,24 +133,18 @@ const db = low(adapter)
      * we just show dummy message here to response
      * ======================================================
      */
-     router.post('/chat/postback', function(req, res) {
+     router.post('/chat/postback',jsonParser,  function(req, res) {
        res.send('Hello, thanks for posting back to me.');
       });
-
-
 
       /*===================================
       * Handle Request from BBM Demo Landing Page
       * ====================================
       */
-
       //request for hello "random" code
       //we will generate 5 digit random number
-        router.get('/chat/hello', function(req, res) {
-
+        router.get('/chat/hello',jsonParser,  function(req, res) {
          res.json ( {helloCode:'12345'});
-
-
         });
 
          // request for latest incoming payload
