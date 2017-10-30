@@ -45,7 +45,7 @@ exports.replyMessage = function (req,res) {
   */
 
 //  var inMsg = req.body.messages[0].trim();
- var inMsg = 'text-selected';
+ var inMsg = 'buttons-selected';
   var outMsg = {};
 
   switch(inMsg) {
@@ -88,7 +88,7 @@ sendMessage = function (token,mTok,chatId,msg) {
   // Start the request
   request(  utils.getReqOptionsForApiService (url,'POST',msg,token) , function (error, response, body) {
       if (!error && response.statusCode == 200) {
-        console.log (response);
+        console.log ("OK");
       }
       else { //error , you can decide to resent
         console.log (response);
