@@ -45,7 +45,7 @@ exports.replyMessage = function (req,res) {
   */
 
 //  var inMsg = req.body.messages[0].trim();
- var inMsg = 'text-selected';
+ var inMsg = 'image-selected';
   var outMsg = {};
 
   switch(inMsg) {
@@ -135,7 +135,7 @@ createLinkMessage = function (chId,chatId,from,to,botInfo) {
   var messages =  [{ "index": 1, "type": "link",
               "link": {
                 "url": "https://placeholdit.imgix.net/~text?txtsize=33&txt=256%C3%97144&w=256&h=144",
-                "target": "def" } }];
+                "target": "https://demobbm.com/demo-client/chat/" } }];
   return  applyEnvelop (chId,chatId,from,to,botInfo,messages);
 }
 
@@ -148,7 +148,6 @@ createButtonsMessage = function (chId,chatId,from,to,botInfo) {
                   "desc": "Exclusive for BBM users. Special discount package for families.",
                   "actions": [ { "type": "text", "text": { "label": "Discover latest offers", "text": "Discover latest offers" } },
                                { "type": "postback", "postback": { "label": "Book this offer", "data": "action=book&location=rome&offer=123" } },
-                               { "type": "postback", "postback": { "label": "Summer        catalogue", "data": "season=summer&location=rome" } },
                                { "type": "link", "link": { "label": "Go to our website", "url": "http://example.com/page/123", "text": "Go to our website" } }
                         ]}
                       }];
