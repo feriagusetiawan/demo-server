@@ -41,39 +41,46 @@ exports.replyMessage = function (req,res) {
   //as best practice, send 'typing...' notification
 
   //now prepare the response based on what is coming ..
-
-  //if new session, establish association first
-
-  /*if(  db.get('sessions[0]').find({ chatId:  req.body.chatId }).size().value()==0 ) {
-    //we are expecting user typed in Hello <5 digit hello-code>
-      var helloCode = req.body.messages[0].trim().slice(-5);
-      db.get('sessions').push({helloCode:helloCode,chatId:req.body.chatId}).write();
-
-  }
-  */
-
-//  var inMsg = req.body.messages[0].trim();
   var inMsg = req.body.messages[0].text;
   var outMsg = {};
-
-  switch(inMsg) {
-  case "text-selected":
-      outMsg =  createTextMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo);
-      break;
-  case "image-selected":
-      outMsg =  createImageMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo);
-      break;
-  case "link-selected":
-      outMsg =  createLinkMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo);
-      break;
-  case "buttons-selected":
-      outMsg =  createButtonsMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo);
-      break;
-  default:
-      outMsg =  createMenuMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo);
-      break;
+  //if user say hello, establish association
+  if (inMsg.toLowerCase().startsWith('hello')) {
+    var msgs = inMsg.split(" ");
+    if (msgs.size>1) {
+      var helloCode = inMsg.trim();
+      db.get('sessions').push({helloCode:helloCode,chatId:req.body.chatId}).write();
     }
+    else { //invalid hello message
+       createReplyMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo,
+        "Please say 'hello xxxx', where xxxx is 4 digit number shown in the demo website");
+    }
+  }
+  //if its something other than hello, we need to check if association establish, if not then ask user to go to demo website
+  else if(  db.get('sessions[0]').find({ chatId: req.body.chatId }).size().value()==0 ) {
+    createReplyMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo,
+     "Please go to demo website https://demobbm.com/demo-client/chatapi from your laptop to use this chatbot");
 
+  }
+  else { //all looks good, show the menu
+    switch(inMsg) {
+    case "text-selected":
+        outMsg =  createTextMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo);
+        break;
+    case "image-selected":
+        outMsg =  createImageMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo);
+        break;
+    case "link-selected":
+        outMsg =  createLinkMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo);
+        break;
+    case "buttons-selected":
+        outMsg =  createButtonsMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo);
+        break;
+    default:
+        outMsg =  createMenuMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo);
+        break;
+      }
+
+  }
 
   //get credential, then send message
   auth.getClientCredential (function (cred){
@@ -120,10 +127,13 @@ applyEnvelop = function (chId,chatId,from,to,botInfo, messages) {
   }
 
 
+createReplyMessage = function (chId,chatId,from,to,botInfo,msg)  {
+  var messages = [{"index":1,"type": "text", "text":  msg}];
+  return  applyEnvelop (chId,chatId,from,to,botInfo,messages);
+}
 
 createTextMessage = function (chId,chatId,from,to,botInfo)  {
   var messages = [{"index":1,"type": "text", "text": "This is demo text message."}];
-
   return  applyEnvelop (chId,chatId,from,to,botInfo,messages);
 }
 
@@ -151,7 +161,7 @@ createButtonsMessage = function (chId,chatId,from,to,botInfo) {
               "buttons": {
                   "imageUrl": "https://example.com/bot/images/image.jpg",
                   "title": "Buttons Example",
-                  "desc": "You can have up 4 buttons, with 3 diff types (text,link and postback)",
+                  "desc": "You can have up to 4 buttons (text,link and postback)",
                   "actions": [ { "type": "text", "text": { "label": "Text Example", "text": "Button Text" } },
                                { "type": "postback", "postback": { "label": "Postback example", "data": "action=myaction&param1=value1&param2=value2" } },
                                { "type": "link", "link": { "label": "Link Example", "url": "https://demobbm.com/demo-client/chat/", "text": "Go to our website" } }

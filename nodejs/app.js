@@ -123,11 +123,15 @@ const db = low(adapter)
           }
       }
             */
-
-      res.json(200,{status:"ok"});
+        //do reply immediately with 200, this will flag message as 'R'
+        res.json(200,{status:"ok"});
         console.log ("==== RECVD ======");
-      console.log (JSON.stringify(req.body));
-      chat.replyMessage (req,res);
+        console.log (JSON.stringify(req.body));
+
+      if (req.body.actions.size()>0)
+        chat.doSomething(req,res);
+      else
+        chat.replyMessage (req,res);
 
 
      });
