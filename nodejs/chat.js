@@ -53,14 +53,12 @@ exports.replyMessage = function (req,res) {
   */
 
 //  var inMsg = req.body.messages[0].trim();
- var inMsg = 'buttons-selected';
+  var inMsg = req.body.messages[0].text;
   var outMsg = {};
 
   switch(inMsg) {
   case "text-selected":
-
       outMsg =  createTextMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo);
-
       break;
   case "image-selected":
       outMsg =  createImageMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo);
@@ -173,7 +171,7 @@ createMenuMessage = function (chId,chatId,from,to,botInfo) {
                    "actions": [{ "type": "text","text": { "label": "Text", "text": "text-selected" } },
                               { "type": "text","text": { "label": "Image", "text": "image-selected" } },
                               { "type": "text","text": { "label": "Link", "text": "link-selected" } },
-                              { "type": "text","text": { "label": "Buttons", "text": "button-selected" } },
+                              { "type": "text","text": { "label": "Buttons", "text": "buttons-selected" } },
                          ]}
                        }];
 
