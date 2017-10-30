@@ -45,7 +45,7 @@ exports.replyMessage = function (req,res) {
   */
 
 //  var inMsg = req.body.messages[0].trim();
- var inMsg = 'link-selected';
+ var inMsg = 'button-selected';
   var outMsg = {};
 
   switch(inMsg) {
