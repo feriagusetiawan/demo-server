@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 var session = require('express-session');
 var auth = require('./auth');
 var chat = require('./chat');
+var api = require('./api');
 var utils = require('./utils');
 
 // create application/json parser
