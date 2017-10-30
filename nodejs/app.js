@@ -40,11 +40,12 @@ const FileSync = require('lowdb/adapters/FileSync')
 const adapter = new FileSync('db.json')
 const db = low(adapter)
 db.defaults(
-    { incomings:[],
+    { sessions:[],
+      incomings:[],
       outgoings:[],
       clientcredential: [],  //client credential for chatbot
       token:[]   // token for API call, one record for each bbmId
-    }).write()
+    }).write();
 
 
 
@@ -136,7 +137,7 @@ db.defaults(
         console.log ("==== RECVD ======");
         console.log (JSON.stringify(req.body));
 
-      if (req.body.actions.size()>0)
+      if (req.body.actions )
         chat.doSomething(req,res);
       else
         chat.replyMessage (req,res);

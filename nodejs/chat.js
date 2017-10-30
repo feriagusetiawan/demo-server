@@ -11,6 +11,13 @@ const FileSync = require('lowdb/adapters/FileSync')
 
 const adapter = new FileSync('db.json')
 const db = low(adapter)
+db.defaults(
+    {
+      incomings:[],
+      outgoings:[],
+      clientcredential: [],  //client credential for chatbot
+      token:[]   // token for API call, one record for each bbmId
+    }).write();
 
 var provision = {chId: "C00132297",
                   bbmId:"3175533613684883456",
@@ -56,7 +63,7 @@ exports.replyMessage = function (req,res) {
     }
   }
   //if its something other than hello, we need to check if association establish, if not then ask user to go to demo website
-  else if(  db.get('sessions[0]').find({ chatId: req.body.chatId }).size().value()==0 ) {
+  else if(db.get('sessions').find({ chatId: req.body.chatId }).size()>0) {
     createReplyMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo,
      "Please go to demo website https://demobbm.com/demo-client/chatapi from your laptop to use this chatbot");
 
