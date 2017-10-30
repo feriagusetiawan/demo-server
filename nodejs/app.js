@@ -123,7 +123,10 @@ const db = low(adapter)
           }
       }
             */
-      res.json(200,{status:"ok"})
+
+      res.json(200,{status:"ok"});
+        console.log ("==== RECVD ======");
+      console.log (JSON.stringify(req.body));
       chat.replyMessage (req,res);
 
 

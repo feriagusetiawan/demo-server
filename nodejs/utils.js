@@ -65,8 +65,8 @@ var rand = require("random-key");
           body: JSON.stringify(body)
       }
 
-      console.log ('getting ApiService option with bearer' + token );
-      console.log (JSON.stringify(options));
+    //  console.log ('getting ApiService option with bearer' + token );
+    //  console.log (JSON.stringify(options));
       return options;
     }
 
