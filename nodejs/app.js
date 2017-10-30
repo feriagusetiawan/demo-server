@@ -49,7 +49,7 @@ const db = low(adapter)
     //client send Shortlived token, and we should exchange with long lived,
     //map it with and store in our db
     router.post('/fastoauth/exchangeToken',jsonParser, function(req, res) {
-      console.log ('exchanging token for ' + req.body.token);
+      console.log ('exchanging token for ' + req.body );
       auth.exchangeToken (req.body.token,function (cred) {
         //put into session so we can retrieve back when needed to call api
         req.session.cred  =  cred;
