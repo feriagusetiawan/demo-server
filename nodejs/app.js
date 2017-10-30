@@ -53,6 +53,7 @@ const db = low(adapter)
       console.log ('exchanging token for ' + req.body );
       auth.exchangeToken (req.body.token,function (cred) {
         //put into session so we can retrieve back when needed to call api
+        console.log ("echangeTOken success: " + JSON.stringify(cred));
         req.session.cred  =  cred;
         res.json ({status:'ok'})
       });
