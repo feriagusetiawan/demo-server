@@ -88,10 +88,10 @@ sendMessage = function (token,mTok,chatId,msg) {
   // Start the request
   request(  utils.getReqOptionsForApiService (url,'POST',msg,token) , function (error, response, body) {
       if (!error && response.statusCode == 200) {
-        console.log ( "200");
+        console.log (response);
       }
       else { //error , you can decide to resent
-        console.log (error);
+        console.log (response);
 
       }
 
