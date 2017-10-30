@@ -21,15 +21,23 @@ var provision = {chId: "C00132297",
                     }
 
 
+/**
+* Take action for Action message, for us we just dump the incoming message
+*/
+exports.doSomething = function (req,res) {
+
+};
+
   /*This is how we handled message from BBM Chat server
   * 1. always find if we have check if the user have session before (chatID is in the DB)
   * 2. if no, parse the message look for "HelloCode", and associate HelloCode with ChatID
   * 3. if yes, parse the message present user with response for various scenarios
   */
 
+
 exports.replyMessage = function (req,res) {
-  //always return with 200 to ack
-  res.code = 200;
+
+
   //as best practice, send 'typing...' notification
 
   //now prepare the response based on what is coming ..
@@ -135,7 +143,7 @@ createLinkMessage = function (chId,chatId,from,to,botInfo) {
   var messages =  [{ "index": 1, "type": "link",
               "link": {
                 "url": "https://placeholdit.imgix.net/~text?txtsize=33&txt=256%C3%97144&w=256&h=144",
-                "target": "https://demobbm.com/demo-client/chat/" } }];
+                "target": "def" } }];
   return  applyEnvelop (chId,chatId,from,to,botInfo,messages);
 }
 
@@ -157,24 +165,19 @@ createButtonsMessage = function (chId,chatId,from,to,botInfo) {
 }
 
 createMenuMessage = function (chId,chatId,from,to,botInfo) {
-  var messages = [
-     { "type": "buttons",
-       "buttons":
-         { "imageUrl": "https://example.com/bot/images/image.jpg",
-           "title": "Menu",
-           "desc": "Please select message type you want to receive",
-           "actions":
-             [ { "type": "text",
-                 "text": { "label": "Text", "text": "text-selected" } },
-               { "type": "image",
-                 "text": { "label": "Image", "text": "image-selected" } },
-               { "type": "image",
-                 "text": { "label": "Link", "text": "link-selected" } },
-               { "type": "image",
-                 "text": { "label": "Buttons", "text": "buttons-selected" } }]
-           }
-     }
-   ];
+
+   var messages = [{ "type": "buttons",
+               "buttons": {
+                   "title": "Menu",
+                   "desc": "Please select message you like to see",
+                   "actions": [{ "type": "text","text": { "label": "Text", "text": "text-selected" } },
+                              { "type": "text","text": { "label": "Image", "text": "image-selected" } },
+                              { "type": "text","text": { "label": "Link", "text": "link-selected" } },
+                              { "type": "text","text": { "label": "Buttons", "text": "button-selected" } },
+                         ]}
+                       }];
+
+
   return  applyEnvelop (chId,chatId,from,to,botInfo,messages);
 
 }
