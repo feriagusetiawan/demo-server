@@ -21,7 +21,8 @@ exports.getUserProfile = function (token,callback) {
   request(  utils.getReqOptionsForApiService (url,'GET',{},token) , function (error, response, body) {
       if (!error && response.statusCode == 200) {
         console.log ( "200");
-        callback (JSON.parse (body));
+
+        callback ( body );
       }
       else { //error , you can decide to resent
         console.log (response );
@@ -36,7 +37,7 @@ exports.getContacts = function (token,callback) {
   request(  utils.getReqOptionsForApiService (url,'GET',{},token) , function (error, response, body) {
       if (!error && response.statusCode == 200) {
         console.log ( "200");
-        callback (JSON.parse (body));
+        callback (body);
       }
       else { //error , you can decide to resent
         console.log (response );
