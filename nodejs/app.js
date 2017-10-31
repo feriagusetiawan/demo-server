@@ -73,9 +73,11 @@ db.defaults(
      //client request for user profile
      router.get('/api/userProfile',urlencodedParser  ,function(req, res) {
        if (req.session.cred===undefined) {
-             res.json ({status:'pls exchange token first'})
+            console.log ( "cred not found");
+             res.json ({status:'pls exchange token first'});
        }
        else api.getUserProfile (req.session.cred.access_token,function (body) {
+           console.log ( "USERPROF " + JSON.stringify(body));
           res.json (body);
        });
       });

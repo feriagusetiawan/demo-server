@@ -14,6 +14,9 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false })
 exports.getUserProfile = function (token,callback) {
 
   var url =  process.env.apiServerUrl  + '/v2/user/profile' ;
+
+  console.log ( "getUserProfile with " + token);
+
   // Start the request
   request(  utils.getReqOptionsForApiService (url,'GET',{},token) , function (error, response, body) {
       if (!error && response.statusCode == 200) {
