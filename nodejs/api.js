@@ -31,13 +31,12 @@ exports.getUserProfile = function (token,callback) {
   })
 }
 exports.getContacts = function (token,callback) {
-  var url =  process.env.apiServerUrl + '/v2/user/contacts' ;
   // Start the request
-  request(  utils.getReqOptionsForApiService (url,'GET',{},token) , function (error, response, body) {
+  request(  utils.getReqOptionsForApiService (process.env.apiServerUrl + '/v2/user/contacts','GET',{},token) , function (error, response, body) {
       if (!error && response.statusCode == 200) {
         console.log ( "200");
         var contacts = JSON.parse (body);
-        request(  utils.getReqOptionsForApiService (url,'GET',contacts,token) , function (error, response, body) {
+        request(  utils.getReqOptionsForApiService (process.env.apiServerUrl + '/v2/user/profile','GET',contacts,token) , function (error, response, body) {
             if (!error && response.statusCode == 200) {
               console.log ( "200");
              callback (JSON.parse (body));
