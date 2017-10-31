@@ -132,6 +132,21 @@ db.defaults(
           }
       }
             */
+        import hmac from hashlib
+        import sha256
+
+        now = int(time.time());
+        payload_json =req.body;
+        payload_bytes = bytes(payload_json, 'utf-8');
+
+        sig = hmac.new(bytes(KEY, 'utf-8'), b'', sha256);
+        sig.update(bytes(str(now), 'utf-8'));
+        sig.update(payload_bytes);
+        signature = sig.hexdigest();
+
+        console.log ('CALC SIGN = ' + signature);
+        console.log ('BBM SIGN = ' + req.headers.BBM-Sig);
+
         //do reply immediately with 200, this will flag message as 'R'
         res.json(200,{status:"ok"});
         console.log ("==== RECVD ======");
