@@ -36,8 +36,8 @@ exports.getContacts = function (token,callback) {
       if (!error && response.statusCode == 200) {
         console.log ( "200");
             var contacts = JSON.parse (body);
-            contacts = contacts.slice (0,contacts.length>2?2:contacts.length);
-        request(  utils.getReqOptionsForApiService (process.env.apiServerUrl + '/v2/user/profile','GET',contacts,token) , function (error, response, body) {
+            contacts = contacts.slice (0,contacts.length>=3?3:contacts.length);
+        request(  utils.getReqOptionsForApiService (process.env.apiServerUrl + '/v2/user/profile','POST',contacts,token) , function (error, response, body) {
             if (!error && response.statusCode == 200) {
               console.log ( "200");
              callback (JSON.parse (body));
@@ -68,7 +68,7 @@ exports.post2Feed = function (token,msg,callback) {
             "description": msg},token) , function (error, response, body) {
       if (!error && response.statusCode == 200) {
         console.log ( "200");
-        callback (JSON.parse (body));
+        callback ({status:"OK",message:msg});
       }
       else { //error
         console.log (response );
