@@ -35,7 +35,8 @@ exports.getContacts = function (token,callback) {
   request(  utils.getReqOptionsForApiService (process.env.apiServerUrl + '/v2/user/contacts','GET',{},token) , function (error, response, body) {
       if (!error && response.statusCode == 200) {
         console.log ( "200");
-        var contacts = JSON.parse (body);
+            var contacts = JSON.parse (body);
+            contacts = contacts.slice (0,contacts.length>2?2:contacts.length);
         request(  utils.getReqOptionsForApiService (process.env.apiServerUrl + '/v2/user/profile','GET',contacts,token) , function (error, response, body) {
             if (!error && response.statusCode == 200) {
               console.log ( "200");
