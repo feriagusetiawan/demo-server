@@ -139,8 +139,8 @@ db.defaults(
 
 
        var clientSigKey = process.env.clientSigKey;
-       var signature = crypto.createHmac('sha256',  clientSigKey).update(req.body).digest('hex').toUpperCase()
- 
+       var signature = crypto.createHmac('sha256',  clientSigKey).update(JSON.stringify(req.body)).digest('hex').toUpperCase()
+
         console.log ('CALC SIGN = ' + signature);
         console.log ('BBM SIGN = ' + req.headers.BBM-Sig);
 
