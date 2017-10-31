@@ -33,6 +33,8 @@ var rand = require("random-key");
         cert: fs.readFileSync(certFile),
         key: fs.readFileSync(keyFile),
     }
+     console.log (JSON.stringify(options));
+
     return options;
   }
 
@@ -42,13 +44,7 @@ var rand = require("random-key");
   * internal utility to get Request options for accessing Partner API
   */
   exports.getReqOptionsForApiService = function(url,method,body,token) {
-      /* var fs = require('fs')
-          , path = require('path')
-           , certFile = path.resolve(__dirname, 'ssl/bbmmobilenews.com_thawte.crt')
-           , keyFile = path.resolve(__dirname, 'ssl/bbmmobilenews.com_thawte.key')  ;
-           , caFile = path.resolve(__dirname, 'ssl/ca.cert.pem');
-        */
-
+     
       // Set the headers
       var headers = {
           'Accept': 'application/json',
