@@ -46,7 +46,7 @@ var rand = require("random-key");
       // Set the headers
       var headers = {
           'Accept': 'application/json',
-           'Accept-Encoding': 'gzip',
+        //   'Accept-Encoding': 'gzip',
            //'Content-Type':"application/x-www-form-urlencoded",
            'Content-Type':"application/json;charset=utf-8",
       //     "Authorization": "Bearer " + token

@@ -21,7 +21,6 @@ exports.getUserProfile = function (token,callback) {
   request(  utils.getReqOptionsForApiService (url,'GET',{},token) , function (error, response, body) {
       if (!error && response.statusCode == 200) {
         console.log ( "200");
-        console.log (body);
         callback (JSON.parse (body));
       }
       else { //error , you can decide to resent
@@ -37,7 +36,7 @@ exports.getContacts = function (token,callback) {
   request(  utils.getReqOptionsForApiService (url,'GET',{},token) , function (error, response, body) {
       if (!error && response.statusCode == 200) {
         console.log ( "200");
-        callback (body);
+        callback (JSON.parse (body));
       }
       else { //error , you can decide to resent
         console.log (response );
@@ -48,10 +47,12 @@ exports.getContacts = function (token,callback) {
 }
 
 
+ 
+
 exports.post2Feed = function (token,msg,callback) {
   var url =  process.env.apiServerUrl +  '/v2/user/timeline/post' ;
   // Start the request
-  request(  utils.getReqOptionsForApiService (url,'POST',
+  request( utils.getReqOptionsForApiService (url,'POST',
           { "templateId":"text",
             "description": msg},token) , function (error, response, body) {
       if (!error && response.statusCode == 200) {
