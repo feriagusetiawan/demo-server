@@ -29,7 +29,7 @@ var rand = require("random-key");
         method: 'POST',
         headers: headers,
         //form: body,
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
         cert: fs.readFileSync(certFile),
         key: fs.readFileSync(keyFile),
     }
