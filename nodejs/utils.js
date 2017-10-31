@@ -47,7 +47,8 @@ var rand = require("random-key");
       var headers = {
           'Accept': 'application/json',
            'Accept-Encoding': 'gzip',
-           'Content-Type':"application/json; charset=utf-8",
+           //'Content-Type':"application/x-www-form-urlencoded",
+           'Content-Type':"application/json;charset=utf-8",
       //     "Authorization": "Bearer " + token
       }
       // Configure the request
@@ -61,8 +62,6 @@ var rand = require("random-key");
           body: JSON.stringify(body)
       }
 
-    //  console.log ('getting ApiService option with bearer' + token );
-      console.log (JSON.stringify(options));
       return options;
     }
 

@@ -21,8 +21,8 @@ exports.getUserProfile = function (token,callback) {
   request(  utils.getReqOptionsForApiService (url,'GET',{},token) , function (error, response, body) {
       if (!error && response.statusCode == 200) {
         console.log ( "200");
-
-        callback ( body );
+        console.log (body);
+        callback (JSON.parse (body));
       }
       else { //error , you can decide to resent
         console.log (response );
