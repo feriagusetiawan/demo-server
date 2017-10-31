@@ -28,12 +28,10 @@ var rand = require("random-key");
         url: url,
         method: 'POST',
         headers: headers,
-        //form: body,
-        body: JSON.stringify(body),
+        form: body,
         cert: fs.readFileSync(certFile),
         key: fs.readFileSync(keyFile),
     }
-     console.log (JSON.stringify(options));
 
     return options;
   }
@@ -44,7 +42,7 @@ var rand = require("random-key");
   * internal utility to get Request options for accessing Partner API
   */
   exports.getReqOptionsForApiService = function(url,method,body,token) {
-     
+
       // Set the headers
       var headers = {
           'Accept': 'application/json',

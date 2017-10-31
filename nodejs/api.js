@@ -15,7 +15,7 @@ exports.getUserProfile = function (token,callback) {
 
   var url =  process.env.apiServerUrl  + '/v2/user/profile' ;
   // Start the request
-  request(  utils.getReqOptionsToApiService (url,'GET',{},token) , function (error, response, body) {
+  request(  utils.getReqOptionsForApiService (url,'GET',{},token) , function (error, response, body) {
       if (!error && response.statusCode == 200) {
         console.log ( "200");
         callback (JSON.parse (body));
@@ -30,7 +30,7 @@ exports.getUserProfile = function (token,callback) {
 exports.getContacts = function (token,callback) {
   var url =  process.env.apiServerUrl + '/v2/user/contacts' ;
   // Start the request
-  request(  utils.getReqOptionsToApiService (url,'GET',{},token) , function (error, response, body) {
+  request(  utils.getReqOptionsForApiService (url,'GET',{},token) , function (error, response, body) {
       if (!error && response.statusCode == 200) {
         console.log ( "200");
         callback (JSON.parse (body));
@@ -47,7 +47,7 @@ exports.getContacts = function (token,callback) {
 exports.post2Feed = function (token,msg,callback) {
   var url =  process.env.apiServerUrl +  '/v2/user/timeline/post' ;
   // Start the request
-  request(  utils.getReqOptionsToApiService (url,'POST',
+  request(  utils.getReqOptionsForApiService (url,'POST',
           { "templateId":"text",
             "description": msg},token) , function (error, response, body) {
       if (!error && response.statusCode == 200) {

@@ -71,7 +71,7 @@ db.defaults(
 
 
      //client request for user profile
-     router.get('/api/userProfile', jsonParser, function(req, res) {
+     router.get('/api/userProfile',urlencodedParser  ,function(req, res) {
        if (req.session.cred===undefined) {
              res.json ({status:'pls exchange token first'})
        }
@@ -81,7 +81,7 @@ db.defaults(
       });
 
      //client request for contact list
-     router.get('/api/contacts', jsonParser, function(req, res) {
+     router.get('/api/contacts', urlencodedParser  , function(req, res) {
        if (req.session.cred===undefined) {
          res.code = 403;
          return;
@@ -93,7 +93,7 @@ db.defaults(
       });
 
       //client request to post to feed
-      router.post('/api/post2Feed',jsonParser,  function(req, res) {
+      router.post('/api/post2Feed',urlencodedParser  , function(req, res) {
         if (req.session.cred===undefined) {
           res.code = 403;
           return;

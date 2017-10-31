@@ -22,39 +22,7 @@ db.defaults(
       token:[]   // token for API call, one record for each bbmId
     }).write()
 
-
-/**
-* internal utils function
-
-  getReqOptions = function(url,form,username,password) {
-    var fs = require('fs')
-        , path = require('path')
-        , certFile = path.resolve(__dirname, 'ssl/bbmmobilenews.com_thawte.crt')
-        , keyFile = path.resolve(__dirname, 'ssl/bbmmobilenews.com_thawte.key')  ;
-    //    , caFile = path.resolve(__dirname, 'ssl/ca.cert.pem');
-
-    // Set the headers
-    var headers = {
-        'Accept': 'application/json',
-         'Accept-Encoding': 'gzip',
-         'Content-Type':"applicaiton/x-www-form-urlencoded",
-        "Authorization": "Basic " + new Buffer( process.env.username + ":" + process.env.password ).toString('base64')
-    }
-    // Configure the request
-    var options = {
-        url: url,
-        method: 'POST',
-        headers: headers,
-        form: form,
-        cert: fs.readFileSync(certFile),
-        key: fs.readFileSync(keyFile),
-
-    }
-    return options;
-  }
-
-*/
-
+ 
 /*
 * acquire client credential for bot
 * check the db if it exists, otherwise, get from token server
@@ -68,7 +36,7 @@ exports.getClientCredential = function (callback) {
     console.log('getClientCredential from Token service');
 
     var params = { grant_type:'client_credentials', scope:'bot'  }
-    var url = "https://auth-beta.bbm.blackberry.com:8443/oauth/token";
+    var url =  process.env.tokenServerUrl;
     // Start the request
     request(utils.getReqOptionsForTokenService(url,params,process.env.username,process.env.password ), function (error, response, body) {
         if (!error && response.statusCode == 200) {
@@ -119,7 +87,7 @@ exports.getClientCredential = function (callback) {
          console.log('getAccessToken with refresh token');
 
          var body = { grant_type:'refresh_token', scope:'v1'  }
-         var url = "https://auth-beta.bbm.blackberry.com:8443/oauth/token";
+         var url =  process.env.tokenServerUrl;
          // Start the request
          request(utils.getReqOptionsForTokenService(url,body,process.env.username ,process.env.password ), function (error, response, body) {
              if (!error && response.statusCode == 200) {
@@ -158,8 +126,9 @@ exports.getClientCredential = function (callback) {
 
     console.log('exchangeToken from Token service ' + shortLivedToken);
 
+
     var body = { grant_type:'exchange_token', access_token:shortLivedToken   }
-    var url = "https://auth-beta.bbm.blackberry.com:8443/oauth/token";
+    var url =  process.env.tokenServerUrl;
     // Start the request
     request(utils.getReqOptionsForTokenService(url,body,process.env.oauthUsername ,process.env.oauthPassword ), function (error, response, body) {
         if (!error && response.statusCode == 200) {
