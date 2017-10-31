@@ -33,8 +33,6 @@ app.use(session({
 var router = express.Router();
 var path = __dirname + '/views/';
 
-var username = process.env.username; //your username
-var pasword = process.env.password; //client secreet
 
 //init the db
 const low = require('lowdb')
@@ -61,8 +59,8 @@ db.defaults(
 
     //client send Shortlived token, and we should exchange with long lived,
     //map it with and store in our db
-    router.post('/fastoauth/exchangeToken',jsonParser, function(req, res) {
-      console.log ('exchanging token for ' + JSON.stringify(req.body) );
+    router.post('/fastoauth/exchangeToken', urlencodedParser  , function(req, res) {
+      console.log ('exchanging token for ' +  req.body.token) );
       auth.exchangeToken (req.body.token,function (cred) {
         //put into session so we can retrieve back when needed to call api
         console.log ("echangeTOken success: " + JSON.stringify(cred));
