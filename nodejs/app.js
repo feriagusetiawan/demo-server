@@ -137,12 +137,17 @@ db.defaults(
             */
 
 
+        /*
+        * Compute signature and match it with BBM provided signature
+        * if not match, simply reject, the request not coming from BBM
+        */
+        var clientSigKey = process.env.clientSigKey;
+        var signature = crypto.createHmac('sha256', clientSigKey).update( JSON.stringify(req.body)).digest().toString('base64');
 
-       var clientSigKey = process.env.clientSigKey;
-       var signature = crypto.createHmac('sha256',  clientSigKey).update(JSON.stringify(req.body)).digest('hex').toUpperCase()
-
-        console.log ('CALC SIGN = ' + signature);
-        console.log ('BBM SIGN = ' + req.headers.BBM-Sig);
+        if (signature != req.headers['bbm-sig']) {
+                res.status(403).send('Invalid signature');
+                return;
+        }
 
         //do reply immediately with 200, this will flag message as 'R'
         res.json(200,{status:"ok"});

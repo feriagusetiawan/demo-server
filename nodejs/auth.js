@@ -156,19 +156,19 @@ exports.getClientCredential = function (callback) {
   */
   exports.exchangeToken = function (shortLivedToken,callback) {
 
-    console.log('exchangeToken from Token service');
+    console.log('exchangeToken from Token service ' + shortLivedToken);
 
     var body = { grant_type:'exchange_token', access_token:shortLivedToken   }
     var url = "https://auth-beta.bbm.blackberry.com:8443/oauth/token";
     // Start the request
-    request(utils.getReqOptionsForTokenService(url,body,process.env.username ,process.env.password ), function (error, response, body) {
+    request(utils.getReqOptionsForTokenService(url,body,process.env.oauthUsername ,process.env.oauthPassword ), function (error, response, body) {
         if (!error && response.statusCode == 200) {
           console.log ( "200");
           body = JSON.parse (body);
             callback (body);
         }
         else {
-          callback (error);
+          callback (response);
         }
 
     });
