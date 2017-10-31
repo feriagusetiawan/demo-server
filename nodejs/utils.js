@@ -20,7 +20,7 @@ var rand = require("random-key");
     var headers = {
         'Accept': 'application/json',
          'Accept-Encoding': 'gzip',
-         'Content-Type':"applicaiton/x-www-form-urlencoded",
+         'Content-Type':"application/x-www-form-urlencoded",
          "Authorization": "Basic " + new Buffer( username + ":" + password ).toString('base64')
     }
     // Configure the request
@@ -28,12 +28,14 @@ var rand = require("random-key");
         url: url,
         method: 'POST',
         headers: headers,
-        form: body,
+        //form: body,
+        body: JSON.stringify(body)
         cert: fs.readFileSync(certFile),
         key: fs.readFileSync(keyFile),
     }
     return options;
   }
+
 
   //
   /**
