@@ -1,3 +1,5 @@
+
+
 require('dotenv').load();
 
 var express = require("express");
@@ -9,6 +11,7 @@ var auth = require('./auth');
 var chat = require('./chat');
 var api = require('./api');
 var utils = require('./utils');
+var crypto = require('crypto');
 
 // create application/json parser
 var jsonParser = bodyParser.json()
@@ -132,18 +135,12 @@ db.defaults(
           }
       }
             */
-        import hmac from hashlib
-        import sha256
 
-        now = int(time.time());
-        payload_json =req.body;
-        payload_bytes = bytes(payload_json, 'utf-8');
 
-        sig = hmac.new(bytes(KEY, 'utf-8'), b'', sha256);
-        sig.update(bytes(str(now), 'utf-8'));
-        sig.update(payload_bytes);
-        signature = sig.hexdigest();
 
+       var clientSigKey = process.env.clientSigKey;
+       var signature = crypto.createHmac('sha256',  clientSigKey).update(req.body).digest('hex').toUpperCase()
+ 
         console.log ('CALC SIGN = ' + signature);
         console.log ('BBM SIGN = ' + req.headers.BBM-Sig);
 
