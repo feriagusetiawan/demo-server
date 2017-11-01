@@ -154,8 +154,6 @@ db.defaults(
         console.log ("==== RECVD ======");
         console.log (JSON.stringify(req.body));
 
-        //log the session
-        db.get('sessions').push({chatId:req.body.chatId,mTok:req.body.mTok,ts: Date.now()}).write();
 
         if (req.body.actions )
           chat.doSomething(req,res);
@@ -165,6 +163,9 @@ db.defaults(
           else
             chat.replyMessage (req,res);
         }
+        //log the session
+        db.get('sessions').remove({chatId:req.body.chatId}).write();
+        db.get('sessions').push({chatId:req.body.chatId,mTok:req.body.mTok,ts: Date.now()}).write();
 
 
 
