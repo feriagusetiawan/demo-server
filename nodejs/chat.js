@@ -28,10 +28,35 @@ var provision = {chId: "C00132297",
                     }
 
 
+  /**
+  * Welcome message for new chat
+  */
+  exports.welcomeMessage = function (req,res) {
+
+
+    var outMsg = createReplyMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo,
+     "Welcome, "  +   req.body.userInfos[req.body.from].name + "! Just type in 'menu' to see what I am capable of. Otherwise I will just echo your message :) "     );
+     //get credential, then send message
+     auth.getClientCredential (function (cred){
+         //  console.log ('sending message now with token ' + cred.accessToken);
+           sendMessage (cred.accessToken,req.body.mTok,req.body.chatId,outMsg);
+     });
+
+  };
+
 /**
-* Take action for Action message, for us we just dump the incoming message
+* Take action for Action message, for us we just echo the action
 */
 exports.doSomething = function (req,res) {
+
+  console.log (req.body.actions);
+  var outMsg = createReplyMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo,
+   "You just postback: " + JSON.stringify(req.body.actions));
+   //get credential, then send message
+   auth.getClientCredential (function (cred){
+       //  console.log ('sending message now with token ' + cred.accessToken);
+         sendMessage (cred.accessToken,req.body.mTok,req.body.chatId,outMsg);
+   });
 
 };
 
@@ -40,62 +65,39 @@ exports.doSomething = function (req,res) {
   * 2. if no, parse the message look for "HelloCode", and associate HelloCode with ChatID
   * 3. if yes, parse the message present user with response for various scenarios
   */
-
-
 exports.replyMessage = function (req,res) {
-
-
-  //as best practice, send 'typing...' notification
 
   //now prepare the response based on what is coming ..
   var inMsg = req.body.messages[0].text;
   var outMsg = {};
-  //if user say hello, establish association
-  if (inMsg.toLowerCase().startsWith('hello')) {
-    var msgs = inMsg.split(" ");
-    if (msgs.size>1) {
-      var helloCode = inMsg.trim();
-      db.get('sessions').push({helloCode:helloCode,chatId:req.body.chatId}).write();
-    }
-    else { //invalid hello message
-       createReplyMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo,
-        "Please say 'hello xxxx', where xxxx is 4 digit number shown in the demo website");
-    }
-  }
-  //if its something other than hello, we need to check if association establish, if not then ask user to go to demo website
-  else if(db.get('sessions').find({ chatId: req.body.chatId }).size()>0) {
-    createReplyMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo,
-     "Please go to demo website https://demobbm.com/demo-client/chatapi from your laptop to use this chatbot");
 
-  }
-  else { //all looks good, show the menu
-    switch(inMsg) {
-    case "text-selected":
-        outMsg =  createTextMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo);
-        break;
-    case "image-selected":
-        outMsg =  createImageMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo);
-        break;
-    case "link-selected":
-        outMsg =  createLinkMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo);
-        break;
-    case "buttons-selected":
-        outMsg =  createButtonsMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo);
-        break;
-    default:
-        outMsg =  createMenuMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo);
-        break;
-      }
+  switch(inMsg) {
+  case "text-selected":
+      outMsg =  createTextMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo);
+      break;
+  case "image-selected":
+      outMsg =  createImageMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo);
+      break;
+  case "link-selected":
+      outMsg =  createLinkMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo);
+      break;
+  case "buttons-selected":
+      outMsg =  createButtonsMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo);
+      break;
+  case "menu":
+      outMsg =  createMenuMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo);
+      break;
+  default: //just echo back
+      outMsg =  createReplyMessage(provision.chId,req.body.chatId ,provision.bbmId,req.body.from,provision.botInfo,
+          "You just said: " + inMsg);
+      break;
+    }
 
-  }
 
   //get credential, then send message
   auth.getClientCredential (function (cred){
-        console.log ('sending message now with token ' + cred.accessToken);
+      //  console.log ('sending message now with token ' + cred.accessToken);
         sendMessage (cred.accessToken,req.body.mTok,req.body.chatId,outMsg);
-       //dump the payload
-        dumpPayload ("outgoings",req.body.chatId, outMsg) ;
-
   });
 
 }
@@ -187,7 +189,7 @@ createMenuMessage = function (chId,chatId,from,to,botInfo) {
                    "actions": [{ "type": "text","text": { "label": "Text", "text": "text-selected" } },
                               { "type": "text","text": { "label": "Image", "text": "image-selected" } },
                               { "type": "text","text": { "label": "Link", "text": "link-selected" } },
-                              { "type": "text","text": { "label": "Buttons", "text": "buttons-selected" } },
+                              { "type": "text","text": { "label": "Buttons", "text": "buttons-selected" } }
                          ]}
                        }];
 

@@ -154,10 +154,18 @@ db.defaults(
         console.log ("==== RECVD ======");
         console.log (JSON.stringify(req.body));
 
-      if (req.body.actions )
-        chat.doSomething(req,res);
-      else
-        chat.replyMessage (req,res);
+        //log the session
+        db.get('sessions').push({chatId:req.body.chatId,mTok:req.body.mTok,ts: Date.now()}).write();
+
+        if (req.body.actions )
+          chat.doSomething(req,res);
+        else {
+          if (  db.get('sessions').find({chatId:req.body.chatId).size()==0)
+            chat.welcomeMessage (req,res);
+          else
+            chat.replyMessage (req,res);
+        }
+
 
 
      });
