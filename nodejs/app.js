@@ -160,7 +160,7 @@ db.defaults(
         if (req.body.actions )
           chat.doSomething(req,res);
         else {
-          if (  db.get('sessions').find({chatId:req.body.chatId).size()==0)
+          if (  db.get('sessions').find({chatId:req.body.chatId}).size()==0)
             chat.welcomeMessage (req,res);
           else
             chat.replyMessage (req,res);
