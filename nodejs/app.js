@@ -154,11 +154,14 @@ db.defaults(
         console.log ("==== RECVD ======");
         console.log (JSON.stringify(req.body));
 
-
+        //if postback (actions), handle with doSomething
+        //if messages, check if this is the first chat or not
+        //for first chat with the user, show welcome message
+        //otherwise run logic to reply message
         if (req.body.actions )
           chat.doSomething(req,res);
         else {
-          if (  db.get('sessions').find({chatId:req.body.chatId}).size()==1)
+          if (  db.get('sessions').find({chatId:req.body.chatId}).size()<=1)
             chat.welcomeMessage (req,res);
           else
             chat.replyMessage (req,res);
@@ -172,36 +175,9 @@ db.defaults(
      });
 
 
-     /* =====================================================
-     * Handle postback when user click on our button message, etc.
-     * we just show dummy message here to response
-     * ======================================================
-     */
-     router.post('/chat/postback',jsonParser,  function(req, res) {
-       res.send('Hello, thanks for posting back to me.');
-      });
 
-      /*===================================
-      * Handle Request from BBM Demo Landing Page
-      * ====================================
-      */
-      //request for hello "random" code
-      //we will generate 5 digit random number
-        router.get('/chat/hello',jsonParser,  function(req, res) {
-         res.json ( {helloCode:'12345'});
-        });
 
-         // request for latest incoming payload
-        router.get('/chat/incomings/:helloCode', function(req, res) {
-             res.json(db.get('incomings').find({helloCode:req.params.helloCode}).value);
-              db.get('incomings').remove({helloCode:req.params.helloCode});
-          });
 
-          //request for latest outgoing payload
-        router.get('/chat/outgoings/:helloCode', function(req, res) {
-              res.json(db.get('outgoings').find({helloCode:req.params.helloCode}).value);
-               db.get('outgoings').remove({helloCode:req.params.helloCode});
-           });
 
 
 app.use("/",router);
