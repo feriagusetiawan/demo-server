@@ -60,11 +60,10 @@ exports.doSomething = function (req,res) {
 
 };
 
-  /*This is how we handled message from BBM Chat server
-  * 1. always find if we have check if the user have session before (chatID is in the DB)
-  * 2. if no, parse the message look for "HelloCode", and associate HelloCode with ChatID
-  * 3. if yes, parse the message present user with response for various scenarios
-  */
+/**
+* Reply message based on the incoming chat message
+*/
+export
 exports.replyMessage = function (req,res) {
 
   //now prepare the response based on what is coming ..
@@ -199,23 +198,7 @@ createMenuMessage = function (chId,chatId,from,to,botInfo) {
 }
 
 
-//some utilities function
-getHelloCodeByChat = function (chatId) {
-      var session = db.get('sessions[0]').find({'chatId':chatId}).value();
-      return session.helloCode;
 
-   }
-
-
-
-/*Dump payload so Demo page can feth later
-* 1. get helloCode from sessions table
-* 2. remove existing records for the helloCode
-* 3. add new payload to table
-*/
 dumpPayload = function (table,chatId,payload) {
-/*  var session = db.get('sessions[0]').find({chatId:chatId}).value();
-  db.get(table).remove({helloCode:session.helloCode});
-  db.get(table).push({helloCode:session.helloCode,payload:payload}).write();
-  */
+
 }
