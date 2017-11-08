@@ -63,7 +63,7 @@ exports.doSomething = function (req,res) {
 /**
 * Reply message based on the incoming chat message
 */
-export
+
 exports.replyMessage = function (req,res) {
 
   //now prepare the response based on what is coming ..
