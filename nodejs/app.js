@@ -113,29 +113,6 @@ db.defaults(
     */
     router.post('/chat/v1/chats', jsonParser,  function(req, res) {
 
-      //For this demo, we need to identify the user by means of Hello code
-      //this is the 5 digit code that user will get from Demo website
-      //they should enter in chat message 'hello 12345'
-      //we store the session in db, so if we cant find, we need to keep asking user to go to website
-      //and key in the code
-
-/*       if(  db.get('sessions[0]')
-            .find({ chatId:  req.body.chatId }).size().value()==0 ) { //we cant find session establish one
-          //check if user entering code now
-          if (req.body.messages.size()>0) {
-            var msg = req.body.messages[0];
-            if (startsWith('hello'))
-            var helloCode = req.body.messages[0].trim().slice(-5);
-            db.get('sessions').push({helloCode:helloCode,chatId:req.body.chatId}).write();
-
-          }
-          else {
-              //ask user to enter hello code from website
-
-          }
-      }
-            */
-
 
         /*
         * Compute signature and match it with BBM provided signature
