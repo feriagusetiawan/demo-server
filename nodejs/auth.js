@@ -23,6 +23,11 @@ db.defaults(
     }).write()
 
 
+/** ============================================
+*   CHAT API
+* ================================================
+*/
+
 /*
 * acquire client credential for bot
 * check the db if it exists, otherwise, get from token server
@@ -67,6 +72,11 @@ exports.getClientCredential = function (callback) {
   }
 
 
+  /** ============================================
+  *   FASTOAUTH
+  * ================================================
+  */
+
   /*
   * exchange for long lived token, and store it in db
   */
@@ -76,6 +86,35 @@ exports.getClientCredential = function (callback) {
 
 
     var body = { grant_type:'exchange_token', access_token:shortLivedToken   }
+    var url =  process.env.tokenServerUrl;
+    // Start the request
+    request(utils.getReqOptionsForTokenService(url,body,process.env.oauthUsername ,process.env.oauthPassword ), function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+          console.log ( "200");
+          body = JSON.parse (body);
+            callback (body);
+        }
+        else {
+          callback (response);
+        }
+
+    });
+  }
+
+  /** ============================================
+  *   NORMAL OAUTH
+  * ================================================
+  */
+
+  /*
+  * get Token from Authorization code
+  */
+  exports.getToken = function (code,callback) {
+
+    console.log('getToken from Token service ' + code);
+
+
+    var body = { grant_type:'authorization_code', scope: 'v1',code: code, redirect_uri: process.env.redirectUrl,  state:'newstate'  }
     var url =  process.env.tokenServerUrl;
     // Start the request
     request(utils.getReqOptionsForTokenService(url,body,process.env.oauthUsername ,process.env.oauthPassword ), function (error, response, body) {
