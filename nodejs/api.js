@@ -18,7 +18,7 @@ exports.getUserProfile = function (token,callback) {
   console.log ( "getUserProfile with " + token);
 
   // Start the request
-  request(  utils.getReqOptionsForApiService (url,'GET',{},token) , function (error, response, body) {
+  request(  utils.getReqOptionsForApiService (url,'GET',null,token) , function (error, response, body) {
       if (!error && response.statusCode == 200) {
         console.log ( "200");
         callback (JSON.parse (body));
@@ -32,7 +32,7 @@ exports.getUserProfile = function (token,callback) {
 }
 exports.getContacts = function (token,callback) {
   // Start the request
-  request(  utils.getReqOptionsForApiService (process.env.apiServerUrl + '/v2/user/contacts','GET',{},token) , function (error, response, body) {
+  request(  utils.getReqOptionsForApiService (process.env.apiServerUrl + '/v2/user/contacts','GET',null,token) , function (error, response, body) {
       if (!error && response.statusCode == 200) {
         console.log ( "200");
             var contacts = JSON.parse (body);

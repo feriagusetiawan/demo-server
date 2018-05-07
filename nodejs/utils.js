@@ -10,11 +10,6 @@ var rand = require("random-key");
  exports.getReqOptionsForTokenService = function(url,body,username,password) {
 
    console.log ('options for token service: ' + url + ":" + username + ":" + password);
-    var fs = require('fs')
-        , path = require('path')
-        , certFile = path.resolve(__dirname, 'ssl/bbmmobilenews.com_thawte.crt')
-        , keyFile = path.resolve(__dirname, 'ssl/bbmmobilenews.com_thawte.key')  ;
-    //    , caFile = path.resolve(__dirname, 'ssl/ca.cert.pem');
 
     // Set the headers
     var headers = {
@@ -29,9 +24,7 @@ var rand = require("random-key");
         method: 'POST',
         headers: headers,
         form: body,
-        cert: fs.readFileSync(certFile),
-        key: fs.readFileSync(keyFile),
-    }
+     }
 
     return options;
   }
@@ -58,9 +51,9 @@ var rand = require("random-key");
           headers: headers,
           auth: {
              'bearer':  token
-           },
-          body: JSON.stringify(body)
+           } 
       }
+       if (body) options.body = JSON.stringify(body);
 
       return options;
     }
